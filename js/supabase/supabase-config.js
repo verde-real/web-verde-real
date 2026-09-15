@@ -7,8 +7,8 @@
 // ============================================================
 
 const SUPABASE_CONFIG = {
-    url: 'https://pzqxvxhzokjmracbwinp.supabase.co',        // ex: https://xxxxxxxx.supabase.co
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6cXh2eGh6b2tqbXJhY2J3aW5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwNTg2MzUsImV4cCI6MjEwNDYzNDYzNX0.UgnmL5YNJ1l0mImbbgIlajt5CWxxBwcVXrXgl1A19tU'
+    url: 'https://zmfydzngobfthmvysezh.supabase.co',        // ex: https://xxxxxxxx.supabase.co
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InptZnlkem5nb2JmdGhtdnlzZXpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0ODc1NjMsImV4cCI6MjEwNTA2MzU2M30.h214Z8b9HZa5SGHX4LfoEks6MFrugvs95SLaaLS-XaY'
 };
 
 function verificarCredenciais() {
