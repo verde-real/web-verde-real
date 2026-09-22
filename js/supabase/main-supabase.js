@@ -133,7 +133,7 @@ function atualizarHeader(auth) {
 
             // Criar botão de perfil
             const perfilBtn = document.createElement('a');
-            perfilBtn.href = user.tipo === 'empresa' || user.tipo === 'empresa_selo' 
+            perfilBtn.href = VerdeRealCore.ehEmpresa(user)
                 ? 'feed-empresa.html' 
                 : 'feed-cliente.html';
             perfilBtn.className = 'btn-login';
