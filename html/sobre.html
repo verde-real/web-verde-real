@@ -381,7 +381,7 @@
                     const { count: totalEmpresas, error: err2 } = await supabase
                         .from('usuarios')
                         .select('*', { count: 'exact', head: true })
-                        .in('tipo', ['empresa', 'empresa_selo']);
+                        .in('tipo', VerdeRealCore.TIPOS_EMPRESA);
 
                     // Buscar total de selos ativos
                     const { count: totalSelos, error: err3 } = await supabase
@@ -429,7 +429,7 @@
             if (btnLoginHeader && typeof auth !== 'undefined' && auth.isLogado()) {
                 const user = auth.getUsuarioLogado();
                 btnLoginHeader.innerHTML = `<i class="fa-solid fa-user"></i> ${user.nome}`;
-                btnLoginHeader.href = user.tipo === 'empresa' || user.tipo === 'empresa_selo' 
+                btnLoginHeader.href = VerdeRealCore.ehEmpresa(user) 
                     ? 'feed-empresa.html' 
                     : 'feed-cliente.html';
             }

@@ -350,13 +350,13 @@
                             <p><i class="fas fa-envelope"></i> ${user.email}</p>
                             <p><i class="fas fa-bullhorn"></i> Publicações: ${totalPosts}</p>
                             <p><i class="fas fa-heart" style="color: var(--dourado);"></i> Curtidas: ${totalLikes}</p>
-                            <p><i class="fas fa-tag"></i> Tipo: ${user.tipo === 'empresa_selo' ? '🏅 Empresa com Selo' : user.tipo === 'empresa' ? '🏢 Empresa' : '👤 Cliente'}</p>
+                            <p><i class="fas fa-tag"></i> Tipo: ${VerdeRealCore.temSeloAtivo(user) ? '🏅 Empresa com Selo' : VerdeRealCore.ehEmpresa(user) ? '🏢 Empresa' : '👤 Cliente'}</p>
                         `;
                     } else {
                         container.innerHTML = `
                             <p><strong>${user.nome}</strong></p>
                             <p><i class="fas fa-envelope"></i> ${user.email}</p>
-                            <p><i class="fas fa-tag"></i> Tipo: ${user.tipo === 'empresa_selo' ? '🏅 Empresa com Selo' : user.tipo === 'empresa' ? '🏢 Empresa' : '👤 Cliente'}</p>
+                            <p><i class="fas fa-tag"></i> Tipo: ${VerdeRealCore.temSeloAtivo(user) ? '🏅 Empresa com Selo' : VerdeRealCore.ehEmpresa(user) ? '🏢 Empresa' : '👤 Cliente'}</p>
                             <p style="font-size: 0.8rem; color: var(--verde-detalhe2);">Carregando estatísticas...</p>
                         `;
                     }

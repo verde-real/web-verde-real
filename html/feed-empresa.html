@@ -233,6 +233,8 @@
     <!-- 3. Banco de dados (operações com Supabase) -->
     <script src="../js/supabase/db-supabase.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/gh/verde-real/verde-real-core@main/dist/index.global.js"></script>
+
     <!-- 4. Autenticação -->
     <script src="../js/supabase/auth-supabase.js"></script>
 
@@ -273,7 +275,7 @@
                 }
                 
                 const user = auth.getUsuarioLogado();
-                if (user.tipo !== 'empresa' && user.tipo !== 'empresa_selo') {
+                if (!VerdeRealCore.ehEmpresa(user)) {
                     alert('Esta página é exclusiva para empresas. Redirecionando para o feed do cliente.');
                     window.location.href = 'feed-cliente.html';
                     return;
@@ -485,14 +487,15 @@
                             <p><i class="fas fa-envelope"></i> ${user.email}</p>
                             <p><i class="fas fa-bullhorn"></i> Publicações: ${totalPosts}</p>
                             <p><i class="fas fa-heart" style="color: var(--dourado);"></i> Curtidas: ${totalLikes}</p>
-                            <p><i class="fas fa-tag"></i> Tipo: ${user.tipo === 'empresa_selo' ? '🏅 Empresa com Selo' : '🏢 Empresa'}</p>
-                            ${user.tipo === 'empresa_selo' ? '<p style="color: var(--verde-primario);"><i class="fas fa-check-circle"></i> Selo Verde Real ativo</p>' : ''}
+                            <p><i class="fas fa-tag"></i> Tipo: ${VerdeRealCore.temSeloAtivo(user) ? '🏅 Empresa com Selo' : '🏢 Empresa'}</p>
+                            ${VerdeRealCore.temSeloAtivo(user) ? '<p style="color: var(--verde-primario);"><i class="fas fa-check-circle"></i> Selo Verde Real ativo</p>' : ''}
                         `;
                     } else {
                         container.innerHTML = `
                             <p><strong>${user.nome}</strong></p>
                             <p><i class="fas fa-envelope"></i> ${user.email}</p>
-                            <p><i class="fas fa-tag"></i> Tipo: ${user.tipo === 'empresa_selo' ? '🏅 Empresa com Selo' : '🏢 Empresa'}</p>
+                            <p><i class="fas fa-tag"></i> Tipo: ${VerdeRealCore.temSeloAtivo(user) ? '🏅 Empresa com Selo' : '🏢 Empresa'}</p>
+                            ${VerdeRealCore.temSeloAtivo(user) ? '<p style="color: var(--verde-primario);"><i class="fas fa-check-circle"></i> Selo Verde Real ativo</p>' : ''}
                             <p style="font-size: 0.8rem; color: var(--verde-detalhe2);">Carregando estatísticas...</p>
                         `;
                     }
