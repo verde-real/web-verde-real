@@ -294,29 +294,18 @@ class LoginManager {
         const confirmar = this.confirmarSenha ? this.confirmarSenha.value : '';
         const termos = this.termos ? this.termos.checked : false;
 
-        // Validações
-        if (!nome || !email || !senha || !confirmar) {
-            this.mostrarMensagem('⚠️ Preencha todos os campos obrigatórios.', 'error');
-            return;
-        }
+        // Validação centralizada (mesma regra do app)
+        const erros = VerdeRealCore.validarCadastro({
+            nome,
+            email,
+            senha,
+            confirmarSenha: confirmar,
+            tipo,
+            aceitouTermos: termos,
+        });
 
-        if (senha !== confirmar) {
-            this.mostrarMensagem('⚠️ As senhas não coincidem.', 'error');
-            return;
-        }
-
-        if (senha.length < 6) {
-            this.mostrarMensagem('⚠️ A senha deve ter pelo menos 6 caracteres.', 'error');
-            return;
-        }
-
-        if (!this.validarEmail(email)) {
-            this.mostrarMensagem('⚠️ Email inválido.', 'error');
-            return;
-        }
-
-        if (!termos) {
-            this.mostrarMensagem('⚠️ Você precisa aceitar os termos de uso.', 'error');
+        if (erros.length > 0) {
+            this.mostrarMensagem('⚠️ ' + erros[0].mensagem, 'error');
             return;
         }
 

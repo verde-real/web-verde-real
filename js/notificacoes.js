@@ -10,23 +10,8 @@
     let pararEscuta = null;
     let notificacoesCache = [];
 
-    const ICONE_POR_TIPO = {
-        curtida: 'fa-heart',
-        comentario: 'fa-comment',
-        status_denuncia: 'fa-flag',
-        selo_empresa: 'fa-award',
-    };
-
-    function formatarTempo(criadoEm) {
-        const diffMs = Date.now() - new Date(criadoEm).getTime();
-        const minutos = Math.floor(diffMs / 60000);
-        if (minutos < 1) return 'agora';
-        if (minutos < 60) return `${minutos}min`;
-        const horas = Math.floor(minutos / 60);
-        if (horas < 24) return `${horas}h`;
-        const dias = Math.floor(horas / 24);
-        return `${dias}d`;
-    }
+    const ICONE_POR_TIPO = VerdeRealCore.ICONE_FONTAWESOME_POR_TIPO;
+    const formatarTempo = VerdeRealCore.formatarTempoRelativo;
 
     function togglePainel(forcar) {
         const painel = document.getElementById('sinoPainel');

@@ -2,14 +2,10 @@
 // notificacoes-pagina.js - Página com todas as notificações
 // ============================================================
 
-const ICONE_POR_TIPO = {
-    curtida: 'fa-heart',
-    comentario: 'fa-comment',
-    status_denuncia: 'fa-flag',
-    selo_empresa: 'fa-award',
-    seguidor: 'fa-user-plus',
-};
+const ICONE_POR_TIPO = VerdeRealCore.ICONE_FONTAWESOME_POR_TIPO;
 
+// Esse formato (data completa) é só dessa página — não tem no core
+// porque o sino do header usa um formato relativo diferente ("2h", "3d").
 function formatarTempoCompleto(criadoEm) {
     return new Date(criadoEm).toLocaleString('pt-BR', {
         day: '2-digit',
@@ -19,6 +15,7 @@ function formatarTempoCompleto(criadoEm) {
         minute: '2-digit',
     });
 }
+
 
 function irParaDestinoPagina(notificacao) {
     if (notificacao.tipo === 'seguidor' && notificacao.atorId) {
