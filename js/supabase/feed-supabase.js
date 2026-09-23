@@ -203,36 +203,18 @@ class FeedService {
     async toggleLike(postId) {
         if (!this.auth || !this.auth.isLogado()) throw new Error('Faça login para curtir.');
         const usuario = this.auth.getUsuarioLogado();
+        const servico = VerdeRealCore.criarServicoCurtidas(this.supabase);
+
+        const post = this.posts.find((p) => p.id === postId);
+        const curtidoAtualmente = post ? !!post.curtido : await servico.verificarCurtida(usuario.id, postId);
 
         try {
-            const { data: existing, error: checkError } = await this.supabase
-                .from('curtidas')
-                .select('id')
-                .eq('post_id', postId)
-                .eq('user_id', usuario.id)
-                .maybeSingle();
-
-            if (checkError) throw new Error('Erro ao verificar curtida: ' + checkError.message);
-
-            const post = this.posts.find((p) => p.id === postId);
-
-            if (existing) {
-                const { error } = await this.supabase.from('curtidas').delete().eq('id', existing.id);
-                if (error) throw new Error('Erro ao remover curtida: ' + error.message);
-                if (post) {
-                    post.curtido = false;
-                    post.curtidas = Math.max(0, (post.curtidas || 0) - 1);
-                }
-                return { curtido: false, total: post ? post.curtidas : 0 };
-            }
-
-            const { error } = await this.supabase.from('curtidas').insert({ post_id: postId, user_id: usuario.id });
-            if (error) throw new Error('Erro ao curtir: ' + error.message);
+            await servico.alternarCurtida(usuario.id, postId, curtidoAtualmente);
             if (post) {
-                post.curtido = true;
-                post.curtidas = (post.curtidas || 0) + 1;
+                post.curtido = !curtidoAtualmente;
+                post.curtidas = Math.max(0, (post.curtidas || 0) + (curtidoAtualmente ? -1 : 1));
             }
-            return { curtido: true, total: post ? post.curtidas : 0 };
+            return { curtido: !curtidoAtualmente, total: post ? post.curtidas : 0 };
         } catch (error) {
             console.error('❌ Erro ao curtir:', error);
             throw error;
@@ -242,18 +224,7 @@ class FeedService {
     async verificarCurtida(postId, usuarioId = null) {
         if (!this.auth || !this.auth.isLogado()) return false;
         const uid = usuarioId || this.auth.getUsuarioLogado().id;
-        try {
-            const { data } = await this.supabase
-                .from('curtidas')
-                .select('id')
-                .eq('post_id', postId)
-                .eq('user_id', uid)
-                .maybeSingle();
-            return !!data;
-        } catch (error) {
-            console.error('Erro ao verificar curtida:', error);
-            return false;
-        }
+        return VerdeRealCore.criarServicoCurtidas(this.supabase).verificarCurtida(uid, postId);
     }
 
     // ============================================================
@@ -261,29 +232,22 @@ class FeedService {
     // ============================================================
     async adicionarComentario(postId, texto) {
         if (!this.auth || !this.auth.isLogado()) throw new Error('Faça login para comentar.');
-        if (!texto || texto.trim().length === 0) throw new Error('Digite um comentário.');
-
         const usuario = this.auth.getUsuarioLogado();
+        const servico = VerdeRealCore.criarServicoComentarios(this.supabase);
 
         try {
-            const { data, error } = await this.supabase
-                .from('comentarios')
-                .insert({ post_id: postId, autor_id: usuario.id, conteudo: texto.trim() })
-                .select()
-                .single();
-
-            if (error) throw new Error('Erro ao adicionar comentário: ' + error.message);
+            const comentario = await servico.criarComentario(postId, usuario.id, texto);
 
             const post = this.posts.find((p) => p.id === postId);
             if (post) post.comentarios_count = (post.comentarios_count || 0) + 1;
 
             console.log('✅ Comentário adicionado!');
             return {
-                id: data.id,
-                texto: data.conteudo,
-                usuario_nome: usuario.nome,
-                usuario_avatar: usuario.avatar_url,
-                data: data.criado_em,
+                id: comentario.id,
+                texto: comentario.conteudo,
+                usuario_nome: comentario.autor.nome,
+                usuario_avatar: comentario.autor.avatarUrl,
+                data: comentario.criadoEm,
             };
         } catch (error) {
             console.error('❌ Erro ao adicionar comentário:', error);
@@ -291,23 +255,15 @@ class FeedService {
         }
     }
 
-    async getComentarios(postId, limite = 50) {
+    async getComentarios(postId) {
         try {
-            const { data, error } = await this.supabase
-                .from('comentarios')
-                .select('*, autor:profiles!comentarios_autor_id_fkey(*)')
-                .eq('post_id', postId)
-                .order('criado_em', { ascending: true })
-                .limit(limite);
-
-            if (error) throw new Error('Erro ao buscar comentários: ' + error.message);
-
-            return (data || []).map((c) => ({
+            const comentarios = await VerdeRealCore.criarServicoComentarios(this.supabase).buscarComentarios(postId);
+            return comentarios.map((c) => ({
                 id: c.id,
                 texto: c.conteudo,
-                usuario_nome: c.autor ? c.autor.nome : 'Usuário',
-                usuario_avatar: c.autor ? c.autor.avatar_url : null,
-                data: c.criado_em,
+                usuario_nome: c.autor.nome,
+                usuario_avatar: c.autor.avatarUrl,
+                data: c.criadoEm,
             }));
         } catch (error) {
             console.error('❌ Erro ao buscar comentários:', error);
