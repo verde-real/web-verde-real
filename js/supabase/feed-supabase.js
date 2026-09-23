@@ -255,9 +255,8 @@ class FeedService {
     // ============================================================
     async getRanking(limite = 5) {
         try {
-            const { data, error } = await this.supabase.from('ranking').select('*').limit(limite);
-            if (error) throw new Error('Erro ao buscar ranking: ' + error.message);
-            return (data || []).map((r) => ({ nome: r.nome, pontos: r.total_denuncias }));
+            const ranking = await VerdeRealCore.criarServicoRanking(this.supabase).buscarRanking(limite);
+            return ranking.map((r) => ({ nome: r.nome, pontos: r.totalDenuncias }));
         } catch (error) {
             console.error('❌ Erro ao calcular ranking:', error);
             return [];
