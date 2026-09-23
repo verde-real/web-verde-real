@@ -23,62 +23,43 @@ class FeedService {
     // ============================================================
     // MAPEAMENTO: schema real (posts) -> formato que o feed.js espera
     // ============================================================
-    mapearPost(linha, idsCurtidos) {
+    formatarPostParaUI(post) {
         return {
-            id: linha.id,
-            titulo: linha.empresa ? linha.empresa.nome : linha.categoria,
-            descricao: linha.conteudo,
-            tipo: linha.categoria,
-            empresa_alvo: linha.empresa ? linha.empresa.nome : null,
-            empresa_id: linha.empresa_id,
-            status_denuncia: linha.status,
-            midia_url: linha.midia_url,
-            data: linha.criado_em,
-            usuario_id: linha.autor_id,
-            usuario_nome: linha.autor ? linha.autor.nome : 'Usuário',
-            usuario_avatar: linha.autor ? linha.autor.avatar_url : null,
-            curtidas: linha.curtidas && linha.curtidas[0] ? linha.curtidas[0].count : 0,
-            comentarios_count: linha.comentarios && linha.comentarios[0] ? linha.comentarios[0].count : 0,
-            curtido: idsCurtidos.has(linha.id),
+            id: post.id,
+            titulo: post.empresa ? post.empresa.nome : post.categoria,
+            descricao: post.conteudo,
+            tipo: post.categoria,
+            empresa_alvo: post.empresa ? post.empresa.nome : null,
+            empresa_id: post.empresaId,
+            status_denuncia: post.status,
+            midia_url: post.midiaUrl,
+            data: post.criadoEm,
+            usuario_id: post.autor.id,
+            usuario_nome: post.autor.nome,
+            usuario_avatar: post.autor.avatarUrl,
+            curtidas: post.totalCurtidas,
+            comentarios_count: 0, // o core não traz esse count ainda; recarregado ao abrir o post
+            curtido: post.curtidoPorMim,
             temSelo: false,
         };
     }
 
     async carregarPosts(limite = 50, offset = 0, filtros = {}) {
         try {
-            let query = this.supabase
-                .from('posts')
-                .select(`
-                    *,
-                    autor:profiles!posts_autor_id_fkey(*),
-                    empresa:profiles!posts_empresa_id_fkey(*),
-                    curtidas(count),
-                    comentarios(count)
-                `)
-                .order('criado_em', { ascending: false })
-                .range(offset, offset + limite - 1);
+            const usuario = this.auth && this.auth.isLogado() ? this.auth.getUsuarioLogado() : null;
+            const categoria = filtros.tipo && filtros.tipo !== 'all' ? filtros.tipo : null;
 
-            if (filtros.tipo && filtros.tipo !== 'all') {
-                query = query.eq('categoria', filtros.tipo);
-            }
+            const servico = VerdeRealCore.criarServicoPosts(this.supabase);
+            let posts = await servico.buscarPosts(usuario ? usuario.id : null, categoria);
+
+            // Busca por texto e paginação continuam no site, por enquanto (o core ainda não tem)
             if (filtros.busca) {
-                query = query.ilike('conteudo', `%${filtros.busca}%`);
+                const termo = filtros.busca.toLowerCase();
+                posts = posts.filter((p) => p.conteudo.toLowerCase().includes(termo));
             }
+            posts = posts.slice(offset, offset + limite);
 
-            const { data, error } = await query;
-            if (error) throw new Error('Erro ao carregar posts: ' + error.message);
-
-            let idsCurtidos = new Set();
-            if (this.auth && this.auth.isLogado() && data && data.length > 0) {
-                const usuario = this.auth.getUsuarioLogado();
-                const { data: curtidas } = await this.supabase
-                    .from('curtidas')
-                    .select('post_id')
-                    .eq('user_id', usuario.id);
-                idsCurtidos = new Set((curtidas || []).map((c) => c.post_id));
-            }
-
-            const enriched = (data || []).map((linha) => this.mapearPost(linha, idsCurtidos));
+            const enriched = posts.map((post) => this.formatarPostParaUI(post));
             this.posts = enriched;
             return enriched;
         } catch (error) {
@@ -89,13 +70,9 @@ class FeedService {
 
     async getPostById(id) {
         try {
-            const { data, error } = await this.supabase
-                .from('posts')
-                .select(`*, autor:profiles!posts_autor_id_fkey(*), empresa:profiles!posts_empresa_id_fkey(*)`)
-                .eq('id', id)
-                .single();
-            if (error) throw new Error('Erro ao buscar post: ' + error.message);
-            return this.mapearPost(data, new Set());
+            const usuario = this.auth && this.auth.isLogado() ? this.auth.getUsuarioLogado() : null;
+            const post = await VerdeRealCore.criarServicoPosts(this.supabase).buscarPostPorId(id, usuario ? usuario.id : null);
+            return post ? this.formatarPostParaUI(post) : null;
         } catch (error) {
             console.error('❌ Erro ao buscar post:', error);
             return null;
@@ -114,36 +91,25 @@ class FeedService {
         }
 
         const usuario = this.auth.getUsuarioLogado();
+        const servico = VerdeRealCore.criarServicoPosts(this.supabase);
 
-        // Tentativa de achar a empresa pelo nome digitado (busca livre por enquanto)
         let empresaId = null;
         if (empresaAlvo) {
-            const { data: empresas } = await this.supabase
-                .from('profiles')
-                .select('id')
-                .eq('tipo', 'empresa')
-                .ilike('nome', `%${empresaAlvo.trim()}%`)
-                .limit(1);
-            if (empresas && empresas.length > 0) empresaId = empresas[0].id;
+            const encontradas = await servico.buscarEmpresas(empresaAlvo);
+            if (encontradas.length > 0) empresaId = encontradas[0].id;
         }
 
         try {
-            const { data, error } = await this.supabase
-                .from('posts')
-                .insert({
-                    autor_id: usuario.id,
-                    conteudo: descricao.trim(),
-                    categoria: tipo || 'Outro',
-                    empresa_id: empresaId,
-                    midia_url: midiaUrl,
-                    tipo_midia: midiaUrl ? 'imagem' : null,
-                })
-                .select(`*, autor:profiles!posts_autor_id_fkey(*), empresa:profiles!posts_empresa_id_fkey(*)`)
-                .single();
+            const postCriado = await servico.criarPost({
+                autorId: usuario.id,
+                conteudo: descricao.trim(),
+                categoria: tipo || 'Outro',
+                empresaId,
+                midiaUrl,
+                tipoMidia: midiaUrl ? 'imagem' : null,
+            });
 
-            if (error) throw new Error('Erro ao criar publicação: ' + error.message);
-
-            const post = this.mapearPost(data, new Set());
+            const post = this.formatarPostParaUI(postCriado);
             this.posts.unshift(post);
             console.log('✅ Publicação criada!');
             return post;
@@ -370,14 +336,8 @@ class FeedService {
     // ============================================================
     async getPublicacoesByUsuario(usuarioId, limite = 20) {
         try {
-            const { data, error } = await this.supabase
-                .from('posts')
-                .select(`*, autor:profiles!posts_autor_id_fkey(*), empresa:profiles!posts_empresa_id_fkey(*)`)
-                .eq('autor_id', usuarioId)
-                .order('criado_em', { ascending: false })
-                .limit(limite);
-            if (error) throw new Error('Erro ao buscar publicações do usuário: ' + error.message);
-            return (data || []).map((linha) => this.mapearPost(linha, new Set()));
+            const posts = await VerdeRealCore.criarServicoPosts(this.supabase).buscarPostsPorAutor(usuarioId, usuarioId);
+            return posts.slice(0, limite).map((post) => this.formatarPostParaUI(post));
         } catch (error) {
             console.error('❌ Erro ao buscar publicações do usuário:', error);
             return [];
