@@ -1404,9 +1404,10 @@ body.pagina-feed .stories-bar .story {
     gap: 0.2rem;
 }
 body.pagina-feed .stories-bar .story:nth-child(1) { grid-column: 3; }
-body.pagina-feed .stories-bar .story:nth-child(2) { grid-column: 2; }
-body.pagina-feed .stories-bar .story:nth-child(3) { grid-column: 4; }
-body.pagina-feed .stories-bar .story:nth-child(4) { grid-column: 5; }
+body.pagina-feed .stories-bar .story:nth-child(2) { grid-column: 1; }
+body.pagina-feed .stories-bar .story:nth-child(3) { grid-column: 2; }
+body.pagina-feed .stories-bar .story:nth-child(4) { grid-column: 4; }
+body.pagina-feed .stories-bar .story:nth-child(5) { grid-column: 5; }
 
 body.pagina-feed .stories-bar .story-circle {
     width: var(--vr-c);
@@ -1424,10 +1425,6 @@ body.pagina-feed .stories-bar .story span {
     max-width: none;
     font-size: 0.62rem;
     white-space: nowrap;
-}
-
-body.pagina-feed .stories-bar .story:active {
-    transform: scale(0.96);
 }
 
 /* Botão principal: maior, preenchido, rótulo em destaque */
@@ -1474,7 +1471,7 @@ body.pagina-feed #perfilCard {
     }
 }
 
-/* ---------- 14.4 Desktop largo: coluna vertical fixa à esquerda ---------- */
+/* ---------- 14.4 Desktop largo: coluna vertical colada à esquerda ---------- */
 @media (min-width: 1360px) {
     body.pagina-feed {
         --vr-offset-topo: calc(var(--vr-header-h) + 16px);
@@ -1487,20 +1484,22 @@ body.pagina-feed #perfilCard {
     body.pagina-feed .stories-bar {
         --vr-c: 56px;
         --vr-c-main: 76px;
-        /* alinhada à esquerda do conteúdo (container de 1280px) */
-        left: max(8px, calc(50vw - 648px));
+        /* colada na borda esquerda, do fim do header ao fim da tela */
+        left: 0;
         right: auto;
-        top: calc(var(--vr-header-h) + 16px);
-        width: 84px;
+        top: var(--vr-header-h);
+        bottom: 0;
+        width: 96px;
         height: auto;
-        max-height: calc(100vh - var(--vr-header-h) - 32px);
         margin: 0;
-        padding: 0.9rem 0.25rem;
+        padding: 1rem 0.25rem;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.9rem;
-        overflow-y: auto;
+        justify-content: space-evenly;   /* espaçamento automático */
+        gap: 0;
+        border-width: 0 1px 0 0;
+        overflow-y: auto;                /* só rola se a tela for muito baixa */
         overflow-x: hidden;
         scrollbar-width: none;
         background: var(--branco);
@@ -1512,13 +1511,68 @@ body.pagina-feed #perfilCard {
         display: none;
     }
 
-    /* Ordem visual: 1 atalho acima, PRINCIPAL no meio, 2 abaixo */
+    /* Ordem visual: 2 acima, PRINCIPAL no meio, 2 abaixo */
     body.pagina-feed .stories-bar .story:nth-child(2) { order: 1; }
-    body.pagina-feed .stories-bar .story:nth-child(1) { order: 2; }
-    body.pagina-feed .stories-bar .story:nth-child(3) { order: 3; }
+    body.pagina-feed .stories-bar .story:nth-child(3) { order: 2; }
+    body.pagina-feed .stories-bar .story:nth-child(1) { order: 3; }
     body.pagina-feed .stories-bar .story:nth-child(4) { order: 4; }
+    body.pagina-feed .stories-bar .story:nth-child(5) { order: 5; }
 
     body.pagina-feed .stories-bar .story span {
         font-size: 0.7rem;
     }
+}
+
+/* ---------- 14.5 Hover suave dos atalhos (sem aumentar) ---------- */
+/* Anula o "scale" antigo do .story e do .story-circle */
+body.pagina-feed .stories-bar .story,
+body.pagina-feed .stories-bar .story:hover,
+body.pagina-feed .stories-bar .story:active,
+body.pagina-feed .stories-bar .story:hover .story-circle {
+    transform: none;
+}
+
+body.pagina-feed .stories-bar .story {
+    transition: color 0.3s ease;
+}
+
+body.pagina-feed .stories-bar .story-circle {
+    transition: box-shadow 0.3s ease;
+}
+
+body.pagina-feed .stories-bar .story-circle .inner {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.pagina-feed .stories-bar .story span {
+    transition: color 0.3s ease;
+}
+
+/* Mouse: o círculo clareia e ganha um halo suave; o rótulo escurece */
+@media (hover: hover) {
+    body.pagina-feed .stories-bar .story:hover .story-circle {
+        box-shadow: 0 0 0 4px rgba(64, 122, 108, 0.2);
+    }
+    body.pagina-feed .stories-bar .story:hover .story-circle .inner {
+        background: var(--verde-claro);
+        color: var(--verde-secundario);
+    }
+    body.pagina-feed .stories-bar .story:hover span {
+        color: var(--verde-primario);
+    }
+    /* Botão principal: fica um tom mais claro de verde */
+    body.pagina-feed .stories-bar .story:first-child:hover .story-circle .inner {
+        background: var(--verde-primario);
+        color: var(--branco);
+    }
+}
+
+/* Toque (celular): mesma troca de cor enquanto o dedo está pressionado */
+body.pagina-feed .stories-bar .story:active .story-circle .inner {
+    background: var(--verde-claro);
+    color: var(--verde-secundario);
+}
+body.pagina-feed .stories-bar .story:first-child:active .story-circle .inner {
+    background: var(--verde-primario);
+    color: var(--branco);
 }
