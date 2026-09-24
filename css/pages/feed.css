@@ -1302,18 +1302,18 @@ body.pagina-feed .header-acoes .sino-btn {
     width: 44px;
     height: 44px;
     background: transparent;
-    border: var(--border-linha);
+    border: 0;
     border-radius: var(--radius-sharp);
     color: var(--verde-secundario);
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     cursor: pointer;
-    transition: background 0.3s, color 0.3s;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .vr-menu-toggle:hover,
 .vr-menu-toggle[aria-expanded="true"] {
-    background: var(--verde-secundario);
-    color: var(--branco);
+    background: var(--verde-claro);
+    color: var(--verde-secundario);
 }
 
 .vr-menu-toggle:focus-visible {
@@ -1381,19 +1381,24 @@ body.pagina-feed .stories-bar {
     top: var(--vr-header-h);
     left: 0;
     right: 0;
-    width: min(100%, 520px);
+    width: auto;
     height: var(--vr-nav-h);
-    margin: 0 auto;
-    padding: 0 0.5rem;
+    margin: 0;
+    /* barra na largura toda; botões limitados a 520px e centralizados */
+    padding: 0 max(0.5rem, calc((100% - 520px) / 2));
     display: grid;
     grid-template-columns: 1fr 1fr auto 1fr 1fr;
     align-items: center;
     justify-items: center;
     gap: 0;
     overflow: visible;
-    background: rgba(255, 255, 255, 0.92);
+    /* mesmo fundo do header: sem "emenda" visível entre os dois */
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+    /* sem borda em cima; só a linha inferior separa do feed */
+    border: 0;
+    border-bottom: var(--border-linha);
     z-index: 900;
 }
 
@@ -1471,35 +1476,49 @@ body.pagina-feed #perfilCard {
     }
 }
 
-/* ---------- 14.4 Desktop largo: coluna vertical colada à esquerda ---------- */
-@media (min-width: 1360px) {
+/* ---------- 14.4 Até 1024px: sem linha entre header e barra de botões ---------- */
+@media (max-width: 1024px) {
+    body.pagina-feed header {
+        border-bottom: 0;
+    }
+}
+
+/* ---------- 14.4b Acima de 1024px: coluna vertical colada à esquerda ----------
+   Mesmo ponto de quebra do feed (acima de 1024px ele tem 2 colunas). */
+@media (min-width: 1025px) {
     body.pagina-feed {
+        --vr-rail-w: 84px;
         --vr-offset-topo: calc(var(--vr-header-h) + 16px);
     }
 
+    /* Recuo à esquerda só onde a coluna encostaria no conteúdo */
     body.pagina-feed .feed-wrapper {
         padding-top: 0;
+        padding-left: max(
+            var(--pad-lateral),
+            calc(var(--vr-rail-w) + 16px - max(0px, calc((100vw - 1280px) / 2)))
+        );
     }
 
     body.pagina-feed .stories-bar {
-        --vr-c: 56px;
-        --vr-c-main: 76px;
-        /* colada na borda esquerda, do fim do header ao fim da tela */
+        --vr-c: 54px;
+        --vr-c-main: 72px;
         left: 0;
         right: auto;
         top: var(--vr-header-h);
         bottom: 0;
-        width: 96px;
+        width: var(--vr-rail-w);
         height: auto;
         margin: 0;
         padding: 1rem 0.25rem;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: space-evenly;   /* espaçamento automático */
+        justify-content: space-evenly;
         gap: 0;
-        border-width: 0 1px 0 0;
-        overflow-y: auto;                /* só rola se a tela for muito baixa */
+        border: 0;
+        border-right: var(--border-linha);
+        overflow-y: auto;
         overflow-x: hidden;
         scrollbar-width: none;
         background: var(--branco);
@@ -1519,7 +1538,12 @@ body.pagina-feed #perfilCard {
     body.pagina-feed .stories-bar .story:nth-child(5) { order: 5; }
 
     body.pagina-feed .stories-bar .story span {
-        font-size: 0.7rem;
+        font-size: 0.68rem;
+    }
+
+    /* Footer: o texto começa depois da coluna lateral */
+    body.pagina-feed footer {
+        padding-left: calc(var(--vr-rail-w) + var(--pad-lateral));
     }
 }
 
