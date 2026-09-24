@@ -1254,3 +1254,271 @@
 .status-tag i {
     color: var(--verde-primario);
 }
+/* ============================================================
+   14. HEADER COM MENU HAMBURGER + NAVEGAÇÃO FIXA (SOMENTE FEEDS)
+   Escopo: body.pagina-feed  (perfil/notificações não são afetados)
+   ============================================================ */
+body.pagina-feed {
+    --vr-header-h: 72px;   /* altura fixa do header nos feeds */
+    --vr-nav-h: 84px;      /* altura da barra horizontal (mobile) */
+    --vr-offset-topo: calc(var(--vr-header-h) + var(--vr-nav-h) + 16px);
+}
+
+/* ---------- 14.1 Header em linha única ---------- */
+body.pagina-feed header {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+    gap: 1rem;
+    height: var(--vr-header-h);
+    min-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+body.pagina-feed .logo-box h1 {
+    justify-content: flex-start;
+}
+
+/* Sino + hamburger, à direita */
+body.pagina-feed .header-acoes {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+body.pagina-feed .header-acoes .sino-btn {
+    padding: 10px;
+    font-size: 1.15rem;
+}
+
+.vr-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: var(--border-linha);
+    border-radius: var(--radius-sharp);
+    color: var(--verde-secundario);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s;
+}
+
+.vr-menu-toggle:hover,
+.vr-menu-toggle[aria-expanded="true"] {
+    background: var(--verde-secundario);
+    color: var(--branco);
+}
+
+.vr-menu-toggle:focus-visible {
+    outline: 2px solid var(--verde-primario);
+    outline-offset: 2px;
+}
+
+/* ---------- 14.2 .nav-links vira painel do menu ---------- */
+body.pagina-feed .nav-links {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: var(--pad-lateral);
+    width: min(300px, calc(100vw - 2rem));
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 0;
+    padding: 0.5rem;
+    background: var(--branco);
+    border: var(--border-linha);
+    box-shadow: 0 10px 30px rgba(37, 66, 60, 0.15);
+    z-index: 1002;
+}
+
+body.pagina-feed .nav-links.vr-menu--aberto {
+    display: flex;
+}
+
+body.pagina-feed .nav-links a:not(.btn-login):not(.btn-acao) {
+    display: block;
+    padding: 0.9rem 1rem;
+    font-size: 0.85rem;
+    text-align: left;
+    border-bottom: var(--border-linha);
+}
+
+body.pagina-feed .nav-links a:not(.btn-login):not(.btn-acao)::after {
+    display: none;
+}
+
+body.pagina-feed .nav-links a:not(.btn-login):not(.btn-acao):hover {
+    background: var(--verde-claro);
+    color: var(--verde-secundario);
+}
+
+body.pagina-feed .nav-links .btn-login {
+    display: block;
+    margin: 0.5rem 0.25rem 0.25rem;
+    padding: 0.85rem 1rem;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+body.pagina-feed .nav-links .btn-login:hover {
+    transform: none;
+}
+
+/* ---------- 14.3 Atalhos: barra horizontal fixa (padrão / celular) ---------- */
+body.pagina-feed .stories-bar {
+    --vr-c: 40px;          /* círculo dos atalhos comuns */
+    --vr-c-main: 52px;     /* círculo do botão principal */
+    position: fixed;
+    top: var(--vr-header-h);
+    left: 0;
+    right: 0;
+    width: min(100%, 520px);
+    height: var(--vr-nav-h);
+    margin: 0 auto;
+    padding: 0 0.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr auto 1fr 1fr;
+    align-items: center;
+    justify-items: center;
+    gap: 0;
+    overflow: visible;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 900;
+}
+
+/* Denunciar/Publicar (1º no HTML) fica no centro exato; os outros 3 ao redor */
+body.pagina-feed .stories-bar .story {
+    grid-row: 1;
+    min-width: 0;
+    gap: 0.2rem;
+}
+body.pagina-feed .stories-bar .story:nth-child(1) { grid-column: 3; }
+body.pagina-feed .stories-bar .story:nth-child(2) { grid-column: 2; }
+body.pagina-feed .stories-bar .story:nth-child(3) { grid-column: 4; }
+body.pagina-feed .stories-bar .story:nth-child(4) { grid-column: 5; }
+
+body.pagina-feed .stories-bar .story-circle {
+    width: var(--vr-c);
+    height: var(--vr-c);
+    margin-bottom: 0;
+}
+
+body.pagina-feed .stories-bar .story-circle .inner {
+    width: calc(var(--vr-c) - 6px);
+    height: calc(var(--vr-c) - 6px);
+    font-size: calc(var(--vr-c) * 0.42);
+}
+
+body.pagina-feed .stories-bar .story span {
+    max-width: none;
+    font-size: 0.62rem;
+    white-space: nowrap;
+}
+
+body.pagina-feed .stories-bar .story:active {
+    transform: scale(0.96);
+}
+
+/* Botão principal: maior, preenchido, rótulo em destaque */
+body.pagina-feed .stories-bar .story:first-child .story-circle {
+    width: var(--vr-c-main);
+    height: var(--vr-c-main);
+    box-shadow: 0 0 0 3px rgba(64, 122, 108, 0.18);
+}
+
+body.pagina-feed .stories-bar .story:first-child .story-circle .inner {
+    width: calc(var(--vr-c-main) - 6px);
+    height: calc(var(--vr-c-main) - 6px);
+    font-size: calc(var(--vr-c-main) * 0.45);
+    background: var(--verde-secundario);
+    color: var(--branco);
+}
+
+body.pagina-feed .stories-bar .story:first-child span {
+    color: var(--verde-secundario);
+    font-weight: 700;
+}
+
+/* Reserva o espaço da barra fixa para o feed não ficar escondido */
+body.pagina-feed .feed-wrapper {
+    padding-top: var(--vr-nav-h);
+}
+
+/* Alvos de scroll não ficam sob header + barra */
+body.pagina-feed #form-empresa,
+body.pagina-feed #form-desc,
+body.pagina-feed #form-selo,
+body.pagina-feed #ranking-container,
+body.pagina-feed #perfilCard {
+    scroll-margin-top: var(--vr-offset-topo);
+}
+
+/* Sino no celular: painel ancora no header (evita sair da tela) */
+@media (max-width: 600px) {
+    body.pagina-feed .header-acoes .sino-notificacoes {
+        position: static;
+    }
+    body.pagina-feed .header-acoes .sino-painel {
+        right: var(--pad-lateral);
+    }
+}
+
+/* ---------- 14.4 Desktop largo: coluna vertical fixa à esquerda ---------- */
+@media (min-width: 1360px) {
+    body.pagina-feed {
+        --vr-offset-topo: calc(var(--vr-header-h) + 16px);
+    }
+
+    body.pagina-feed .feed-wrapper {
+        padding-top: 0;
+    }
+
+    body.pagina-feed .stories-bar {
+        --vr-c: 56px;
+        --vr-c-main: 76px;
+        /* alinhada à esquerda do conteúdo (container de 1280px) */
+        left: max(8px, calc(50vw - 648px));
+        right: auto;
+        top: calc(var(--vr-header-h) + 16px);
+        width: 84px;
+        height: auto;
+        max-height: calc(100vh - var(--vr-header-h) - 32px);
+        margin: 0;
+        padding: 0.9rem 0.25rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.9rem;
+        overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-width: none;
+        background: var(--branco);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+
+    body.pagina-feed .stories-bar::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Ordem visual: 1 atalho acima, PRINCIPAL no meio, 2 abaixo */
+    body.pagina-feed .stories-bar .story:nth-child(2) { order: 1; }
+    body.pagina-feed .stories-bar .story:nth-child(1) { order: 2; }
+    body.pagina-feed .stories-bar .story:nth-child(3) { order: 3; }
+    body.pagina-feed .stories-bar .story:nth-child(4) { order: 4; }
+
+    body.pagina-feed .stories-bar .story span {
+        font-size: 0.7rem;
+    }
+}
