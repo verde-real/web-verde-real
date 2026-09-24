@@ -180,8 +180,12 @@
         if (!navLinks || document.getElementById('sinoNotificacoes')) return;
 
         const estrutura = criarEstrutura();
+        const headerAcoes = document.querySelector('.header-acoes');
         const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
+        if (headerAcoes) {
+            // Feeds com hamburger: sino fica no header, à esquerda do ☰
+            headerAcoes.insertBefore(estrutura, headerAcoes.firstChild);
+        } else if (logoutBtn) {
             navLinks.insertBefore(estrutura, logoutBtn);
         } else {
             navLinks.appendChild(estrutura);
