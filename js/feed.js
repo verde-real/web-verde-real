@@ -110,8 +110,10 @@ class FeedManager {
     // ============================================================
     // RENDERIZAR FEED
     // ============================================================
-    renderizarFeed() {
+    renderizarFeed(opcoes) {
         if (!this.container) return;
+        opcoes = opcoes || {};
+        const manterAnteriores = !!opcoes.manterAnteriores;
 
         // Aplicar filtros locais (já que o Supabase já aplicou os filtros)
         let postsFiltrados = this.posts;
@@ -140,28 +142,49 @@ class FeedManager {
             return;
         }
 
-        // Paginação
-        const start = (this.paginaAtual - 1) * this.postsPorPagina;
-        const paginados = postsFiltrados.slice(start, start + this.postsPorPagina);
+        // Paginação: "fim" é cumulativo (mantém tudo que já apareceu antes)
+        const fim = this.paginaAtual * this.postsPorPagina;
 
-        let html = '';
-        paginados.forEach(post => {
-            html += this.renderizarPost(post);
-        });
-
-        // Botão "Carregar mais"
-        if (postsFiltrados.length > start + this.postsPorPagina) {
-            html += `
-                <div style="text-align: center; margin: 2rem 0;">
-                    <button class="btn-acao btn--vazado" id="btnCarregarMais">
-                        <i class="fas fa-chevron-down"></i> Carregar mais
-                    </button>
-                </div>
-            `;
+        // Remove o bloco do "Carregar mais" atual, para recriá-lo (ou não) no final
+        const wrapperBtnAntigo = document.getElementById('btnCarregarMais');
+        if (wrapperBtnAntigo && wrapperBtnAntigo.parentElement) {
+            wrapperBtnAntigo.parentElement.remove();
         }
 
-        this.container.innerHTML = html;
-        this.configurarEventosPost();
+        let elementosNovos = null;
+
+        if (manterAnteriores) {
+            // Só renderiza a fatia nova (a página que acabou de ser liberada)
+            // e ANEXA ao que já está na tela, sem tocar nos posts já carregados.
+            const inicio = (this.paginaAtual - 1) * this.postsPorPagina;
+            const novosPosts = postsFiltrados.slice(inicio, fim);
+
+            const temp = document.createElement('div');
+            temp.innerHTML = novosPosts.map(post => this.renderizarPost(post)).join('');
+            elementosNovos = Array.from(temp.children);
+            elementosNovos.forEach(no => this.container.appendChild(no));
+        } else {
+            // Renderização completa (carga inicial, filtro, edição, exclusão etc.)
+            const paginados = postsFiltrados.slice(0, fim);
+            this.container.innerHTML = paginados.map(post => this.renderizarPost(post)).join('');
+        }
+
+        // Botão "Carregar mais" (só se ainda existirem posts não exibidos)
+        if (postsFiltrados.length > fim) {
+            const divBtn = document.createElement('div');
+            divBtn.style.textAlign = 'center';
+            divBtn.style.margin = '2rem 0';
+            divBtn.innerHTML = `
+                <button class="btn-acao btn--vazado" id="btnCarregarMais">
+                    <i class="fas fa-chevron-down"></i> Carregar mais
+                </button>
+            `;
+            this.container.appendChild(divBtn);
+        }
+
+        // Se foi anexo incremental, só liga os eventos dos posts NOVOS
+        // (evita duplicar listeners nos que já estavam na tela).
+        this.configurarEventosPost(elementosNovos);
     }
 
     // ============================================================
@@ -174,7 +197,7 @@ class FeedManager {
     // ============================================================
     // CONFIGURAR EVENTOS
     // ============================================================
-    configurarEventos() {
+        configurarEventos() {
         // Filtros
         const filtroTipo = document.getElementById('filtroTipo');
         const ordenacao = document.getElementById('ordenacao');
@@ -210,9 +233,9 @@ class FeedManager {
             });
         }
 
-        // Carregar mais
+        // Carregar mais (mantém os posts já carregados na tela)
         document.addEventListener('click', (e) => {
-            if (e.target.id === 'btnCarregarMais') {
+            if (e.target.closest('#btnCarregarMais')) {
                 this.paginaAtual++;
                 this.renderizarFeed({ manterAnteriores: true });
             }
@@ -222,9 +245,23 @@ class FeedManager {
     // ============================================================
     // CONFIGURAR EVENTOS DOS POSTS
     // ============================================================
-    configurarEventosPost() {
-        // Curtidas
-        document.querySelectorAll('.like-btn').forEach(btn => {
+        // escopo: lista opcional de elementos .post-card recém-adicionados.
+    // Quando informado, os listeners são ligados SOMENTE nesses elementos
+    // (usado no "Carregar mais", para não duplicar eventos nos posts que
+    // já estavam na tela). Sem escopo, mantém o comportamento original
+    // (documento inteiro), usado na renderização completa do feed.
+    configurarEventosPost(escopo) {
+        const buscar = (seletor) => {
+            if (!escopo) return document.querySelectorAll(seletor);
+            const encontrados = [];
+            escopo.forEach(el => {
+                if (el.matches && el.matches(seletor)) encontrados.push(el);
+                encontrados.push(...el.querySelectorAll(seletor));
+            });
+            return encontrados;
+        };
+
+        buscar('.like-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 const id = btn.dataset.id;
@@ -232,8 +269,7 @@ class FeedManager {
             });
         });
 
-                // Salvar
-        document.querySelectorAll('.save-btn').forEach(btn => {
+        buscar('.save-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 const id = btn.dataset.id;
@@ -241,8 +277,7 @@ class FeedManager {
             });
         });
 
-        // Comentários (toggle)
-        document.querySelectorAll('.comment-toggle').forEach(btn => {
+        buscar('.comment-toggle').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const id = btn.dataset.id;
@@ -257,10 +292,7 @@ class FeedManager {
             });
         });
 
-
-
-        // Adicionar comentário
-        document.querySelectorAll('.add-comment').forEach(btn => {
+        buscar('.add-comment').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 const id = btn.dataset.id;
@@ -272,8 +304,7 @@ class FeedManager {
             });
         });
 
-        // Adicionar comentário com Enter
-        document.querySelectorAll('.comment-form input').forEach(input => {
+        buscar('.comment-form input').forEach(input => {
             input.addEventListener('keydown', async (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();
@@ -284,8 +315,7 @@ class FeedManager {
             });
         });
 
-        // Editar post
-        document.querySelectorAll('.edit-btn').forEach(btn => {
+        buscar('.edit-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 const id = btn.dataset.id;
@@ -293,8 +323,7 @@ class FeedManager {
             });
         });
 
-        // Excluir post
-        document.querySelectorAll('.delete-btn').forEach(btn => {
+        buscar('.delete-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 const id = btn.dataset.id;
@@ -302,10 +331,7 @@ class FeedManager {
             });
         });
 
-        
-        // Abrir a página da denúncia ao clicar no post
-        // (exceto em botões de ação, no autor/empresa e no formulário de comentário)
-        document.querySelectorAll('.post-card').forEach(card => {
+        buscar('.post-card').forEach(card => {
             card.addEventListener('click', (e) => {
                 if (e.target.closest('.post-user, .action-btn, .comment-form, .comment-ver-todos, a, button')) {
                     return;
