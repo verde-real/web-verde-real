@@ -206,13 +206,18 @@ class FeedManager {
         if (filtroTipo) {
             filtroTipo.addEventListener('change', () => this.aplicarFiltrosUI());
         }
-
         if (ordenacao) {
             ordenacao.addEventListener('change', () => this.aplicarFiltrosUI());
         }
-
         if (buscaInput) {
-            buscaInput.addEventListener('input', () => this.aplicarFiltrosUI());
+            // Debounce: só filtra depois que a pessoa para de digitar por 350ms,
+            // e a busca em si não refaz consulta no banco (só filtra o que já
+            // está carregado) — resolve o travamento ao digitar.
+            let buscaTimeout = null;
+            buscaInput.addEventListener('input', () => {
+                clearTimeout(buscaTimeout);
+                buscaTimeout = setTimeout(() => this.aplicarFiltrosUI(), 350);
+            });
         }
 
         // Botão de publicar
@@ -606,17 +611,27 @@ class FeedManager {
     // ============================================================
     // FILTROS
     // ============================================================
-    aplicarFiltrosUI() {
+        async aplicarFiltrosUI() {
         const tipoSelect = document.getElementById('filtroTipo');
         const ordenacaoSelect = document.getElementById('ordenacao');
         const buscaInput = document.getElementById('buscaInput');
 
-        this.filtros.tipo = tipoSelect ? tipoSelect.value : 'all';
+        const novoTipo = tipoSelect ? tipoSelect.value : 'all';
+        const tipoMudou = novoTipo !== this.filtros.tipo;
+
+        this.filtros.tipo = novoTipo;
         this.filtros.ordenacao = ordenacaoSelect ? ordenacaoSelect.value : 'recent';
         this.filtros.busca = buscaInput ? buscaInput.value.trim().toLowerCase() : '';
 
         this.paginaAtual = 1;
-        this.carregarPosts();
+
+        // Só busca de novo no Supabase quando a CATEGORIA muda de verdade
+        // (é o único filtro que o banco realmente aplica). Busca por texto
+        // é sempre local, sobre o que já está carregado — sem ida ao banco.
+        if (tipoMudou) {
+            await this.carregarPosts();
+        }
+        this.renderizarFeed();
     }
 
     // ============================================================
