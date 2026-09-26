@@ -49,7 +49,6 @@
             <a href="index.html">Início</a>
             <a href="selo.html">Selo Verde</a>
             <a href="sobre.html">Sobre nós</a>
-            <a href="#" id="perfilLink">Meu Perfil</a>
             <a href="login.html" class="btn-login" id="logoutBtn">Sair</a>
         </nav>
     </header>
@@ -283,17 +282,6 @@
                             auth.logout();
                         }
                         window.location.href = 'login.html';
-                    });
-                }
-
-                // Perfil link
-                const perfilLink = document.getElementById('perfilLink');
-                if (perfilLink) {
-                    perfilLink.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        document.getElementById('perfilCard').scrollIntoView({ 
-                            behavior: 'smooth' 
-                        });
                     });
                 }
 

@@ -198,15 +198,6 @@ class FeedManager {
             publicarBtn.addEventListener('click', () => this.publicarPost());
         }
 
-        // Perfil link
-        const perfilLink = document.getElementById('perfilLink');
-        if (perfilLink) {
-            perfilLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                document.getElementById('perfilCard')?.scrollIntoView({ behavior: 'smooth' });
-            });
-        }
-
         // Logout
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
@@ -223,7 +214,7 @@ class FeedManager {
         document.addEventListener('click', (e) => {
             if (e.target.id === 'btnCarregarMais') {
                 this.paginaAtual++;
-                this.renderizarFeed();
+                this.renderizarFeed({ manterAnteriores: true });
             }
         });
     }

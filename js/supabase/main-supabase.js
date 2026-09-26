@@ -131,15 +131,6 @@ function atualizarHeader(auth) {
             const logoutBtn = navLinks.querySelector('#logoutBtn');
             if (logoutBtn) logoutBtn.remove();
 
-            // Criar botão de perfil
-            const perfilBtn = document.createElement('a');
-            perfilBtn.href = VerdeRealCore.ehEmpresa(user)
-                ? 'feed-empresa.html' 
-                : 'feed-cliente.html';
-            perfilBtn.className = 'btn-login';
-            perfilBtn.innerHTML = `<i class="fa-solid fa-user"></i> ${user.nome}`;
-            navLinks.appendChild(perfilBtn);
-
             // Criar botão de logout
             const logout = document.createElement('a');
             logout.id = 'logoutBtn';
@@ -205,15 +196,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // ============================================================
     // 4.2. CONFIGURAR HEADER
     // ============================================================
-    // Aguardar o auth ser carregado
-    function configurarHeaderComAuth() {
-        if (typeof auth !== 'undefined' && auth) {
-            atualizarHeader(auth);
-            console.log('✅ Header configurado com autenticação!');
-        } else {
-            console.log('⏳ Aguardando AuthService...');
-            setTimeout(configurarHeaderComAuth, 500);
-        }
+    async function configurarHeaderComAuth() {
+    if (typeof auth === 'undefined' || !auth) {
+        console.log('⏳ Aguardando AuthService...');
+        setTimeout(configurarHeaderComAuth, 500);
+        return;
+    }
+    if (auth.initPromise) {
+        await auth.initPromise;
+    }
+    atualizarHeader(auth);
+        console.log('✅ Header configurado com autenticação!');
     }
 
     // Iniciar configuração do header
