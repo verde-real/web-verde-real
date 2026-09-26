@@ -247,8 +247,8 @@ class FeedManager {
                     <button class="action-btn comment-toggle" data-id="${post.id}">
                         <i class="far fa-comment"></i> Comentar
                     </button>
-                    <button class="action-btn save-btn" data-id="${post.id}">
-                        <i class="far fa-bookmark"></i> Salvar
+                    <button class="action-btn save-btn ${post.salvo ? 'active-save' : ''}" data-id="${post.id}">
+                        <i class="${post.salvo ? 'fas' : 'far'} fa-bookmark"></i> Salvar
                     </button>
                 </div>
 
@@ -352,6 +352,15 @@ class FeedManager {
             });
         });
 
+                // Salvar
+        document.querySelectorAll('.save-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const id = btn.dataset.id;
+                await this.toggleSave(id);
+            });
+        });
+
         // Comentários (toggle)
         document.querySelectorAll('.comment-toggle').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -367,6 +376,8 @@ class FeedManager {
                 }
             });
         });
+
+
 
         // Adicionar comentário
         document.querySelectorAll('.add-comment').forEach(btn => {
@@ -452,6 +463,33 @@ class FeedManager {
         }
     }
 
+    
+    // Salvar / remover dos salvos
+    async toggleSave(postId) {
+        try {
+            if (typeof feed === 'undefined') {
+                alert('Erro: FeedService não disponível.');
+                return;
+            }
+
+            const result = await feed.toggleSave(postId);
+
+            const btn = document.querySelector(`.save-btn[data-id="${postId}"]`);
+            if (btn) {
+                btn.classList.toggle('active-save', result.salvo);
+                const icon = btn.querySelector('i');
+                icon.className = result.salvo ? 'fas fa-bookmark' : 'far fa-bookmark';
+            }
+
+            const post = this.posts.find(p => p.id === postId);
+            if (post) post.salvo = result.salvo;
+
+        } catch (error) {
+            console.error('❌ Erro ao salvar:', error);
+            alert(error.message || 'Erro ao salvar publicação.');
+        }
+    }
+
     // Adicionar comentário
     async adicionarComentario(postId, texto) {
         try {
@@ -495,15 +533,20 @@ class FeedManager {
                 if (!comentarios || comentarios.length === 0) {
                     container.innerHTML = '<p style="color:#999;font-size:0.85rem;margin:0.5rem 0;">Nenhum comentário ainda.</p>';
                 } else {
-                    container.innerHTML = comentarios.map(c => `
-                        <div class="comment">
-                            <div class="comment-avatar">${c.usuario_avatar || '👤'}</div>
-                            <div>
-                                <strong>${c.usuario_nome}</strong>
-                                <span>${c.texto}</span>
+                    container.innerHTML = comentarios.map(c => {
+                        const avatarHTML = c.usuario_avatar
+                            ? `<img src="${c.usuario_avatar}" class="comment-avatar" style="object-fit:cover;">`
+                            : `<div class="comment-avatar">${(c.usuario_nome || '?').charAt(0).toUpperCase()}</div>`;
+                        return `
+                            <div class="comment">
+                                ${avatarHTML}
+                                <div>
+                                    <strong>${c.usuario_nome}</strong>
+                                    <span>${c.texto}</span>
+                                </div>
                             </div>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
                 }
             }
         } catch (error) {
@@ -701,6 +744,9 @@ class FeedManager {
             <p><i class="fas fa-bullhorn"></i> Publicações: ${meusPosts.length}</p>
             <p><i class="fas fa-heart" style="color:var(--dourado);"></i> Curtidas: ${totalLikes}</p>
             <p><i class="fas fa-tag"></i> Tipo: ${this.user.tipo === 'empresa_selo' ? '🏅 Empresa com Selo' : this.user.tipo === 'empresa' ? '🏢 Empresa' : '👤 Cliente'}</p>
+            <a href="perfil.html?id=${this.user.id}" class="btn-acao btn--escuro" style="margin-top:0.75rem;display:inline-flex;">
+                <i class="fas fa-bookmark"></i> Ver perfil e salvos
+            </a>
         `;
     }
 

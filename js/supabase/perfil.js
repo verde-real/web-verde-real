@@ -71,6 +71,18 @@ async function carregarPerfil() {
         jaSegue = !!seguindo;
     }
 
+    // Posts salvos: só busca e só aparece no PRÓPRIO perfil
+    const ehMeuPerfil = usuarioLogado && usuarioLogado.id === perfilId;
+    let postsSalvos = [];
+    if (ehMeuPerfil) {
+        const { data: salvos } = await window.supabase
+            .from('posts_salvos')
+            .select('criado_em, post:posts(*, autor:profiles!posts_autor_id_fkey(*))')
+            .eq('user_id', perfilId)
+            .order('criado_em', { ascending: false });
+        postsSalvos = (salvos || []).map((s) => s.post).filter(Boolean);
+    }
+
     renderizarPerfil({
         perfil,
         ehEmpresa,
@@ -81,6 +93,8 @@ async function carregarPerfil() {
         postsVinculados: postsVinculados || [],
         jaSegue,
         usuarioLogado,
+        ehMeuPerfil,
+        postsSalvos,
     });
 }
 
@@ -98,7 +112,7 @@ function cardPost(p) {
     `;
 }
 
-function renderizarPerfil({ perfil, ehEmpresa, selos, totalSeguidores, totalSeguindo, postsProprios, postsVinculados, jaSegue, usuarioLogado }) {
+function renderizarPerfil({ perfil, ehEmpresa, selos, totalSeguidores, totalSeguindo, postsProprios, postsVinculados, jaSegue, usuarioLogado, ehMeuPerfil, postsSalvos }) {
     const container = document.getElementById('perfil-container');
     const seloAtivo = selos.find((s) => s.status === 'ativo');
 
@@ -171,6 +185,16 @@ function renderizarPerfil({ perfil, ehEmpresa, selos, totalSeguidores, totalSegu
                 : postsProprios.map(cardPost).join('')
             }
         </div>
+
+        ${ehMeuPerfil ? `
+            <h3 style="margin:1.5rem 0 1rem;"><i class="fas fa-bookmark"></i> Posts salvos (${postsSalvos.length})</h3>
+            <div>
+                ${postsSalvos.length === 0
+                    ? '<p style="color:var(--verde-detalhe2);">Você ainda não salvou nenhuma publicação.</p>'
+                    : postsSalvos.map(cardPost).join('')
+                }
+            </div>
+        ` : ''}
     `;
 
     const btnSeguir = document.getElementById('btnSeguir');

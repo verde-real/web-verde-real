@@ -60,6 +60,16 @@ class FeedService {
             posts = posts.slice(offset, offset + limite);
 
             const enriched = posts.map((post) => this.formatarPostParaUI(post));
+
+            if (usuario) {
+                const { data: salvos } = await this.supabase
+                    .from('posts_salvos')
+                    .select('post_id')
+                    .eq('user_id', usuario.id);
+                const idsSalvos = new Set((salvos || []).map((s) => s.post_id));
+                enriched.forEach((p) => { p.salvo = idsSalvos.has(p.id); });
+            }
+
             this.posts = enriched;
             return enriched;
         } catch (error) {
@@ -191,6 +201,47 @@ class FeedService {
         if (!this.auth || !this.auth.isLogado()) return false;
         const uid = usuarioId || this.auth.getUsuarioLogado().id;
         return VerdeRealCore.criarServicoCurtidas(this.supabase).verificarCurtida(uid, postId);
+    }
+
+        // ============================================================
+    // SALVOS
+    // ============================================================
+    async toggleSave(postId) {
+        if (!this.auth || !this.auth.isLogado()) throw new Error('Faça login para salvar.');
+        const usuario = this.auth.getUsuarioLogado();
+
+        const post = this.posts.find((p) => p.id === postId);
+        let salvoAtualmente = post ? !!post.salvo : false;
+        if (!post) {
+            const { data } = await this.supabase
+                .from('posts_salvos')
+                .select('id')
+                .eq('post_id', postId)
+                .eq('user_id', usuario.id)
+                .maybeSingle();
+            salvoAtualmente = !!data;
+        }
+
+        try {
+            if (salvoAtualmente) {
+                const { error } = await this.supabase
+                    .from('posts_salvos')
+                    .delete()
+                    .eq('post_id', postId)
+                    .eq('user_id', usuario.id);
+                if (error) throw new Error(error.message);
+            } else {
+                const { error } = await this.supabase
+                    .from('posts_salvos')
+                    .insert({ post_id: postId, user_id: usuario.id });
+                if (error) throw new Error(error.message);
+            }
+            if (post) post.salvo = !salvoAtualmente;
+            return { salvo: !salvoAtualmente };
+        } catch (error) {
+            console.error('❌ Erro ao salvar/remover publicação:', error);
+            throw error;
+        }
     }
 
     // ============================================================
