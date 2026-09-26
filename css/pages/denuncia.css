@@ -1,0 +1,192 @@
+/* ============================================================
+   denuncia.css - Página de detalhe de uma única denúncia
+   Reaproveita .post-card, .comment etc. de feed.css; aqui só
+   ficam o cabeçalho da página, as etapas e o campo fixo.
+   ============================================================ */
+
+.denuncia-central {
+    max-width: 680px;
+    margin: 2rem auto;
+    padding: 0 var(--pad-lateral) 6rem;
+}
+
+/* Barra "voltar / Denúncia", igual ao cabeçalho da tela do app */
+.denuncia-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 0 1.25rem;
+}
+
+.denuncia-topo h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--texto-dark);
+    margin: 0;
+}
+
+.denuncia-voltar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: 0;
+    color: var(--verde-secundario);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.denuncia-voltar:hover {
+    color: var(--verde-primario);
+}
+
+.denuncia-topo-espaco {
+    width: 36px;
+}
+
+/* Etapas da denúncia (bolinhas conectadas) */
+.denuncia-etapas {
+    display: flex;
+    padding: 0.5rem 1.5rem 1.5rem;
+    margin-top: -0.5rem;
+}
+
+.denuncia-etapa {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.denuncia-etapa-bola {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--verde-detalhe);
+    background: transparent;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.denuncia-etapa--ativa .denuncia-etapa-bola {
+    background: var(--verde-primario);
+    border-color: var(--verde-primario);
+}
+
+.denuncia-etapa-texto {
+    margin-top: 0.4rem;
+    font-family: var(--fonte-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.05em;
+    color: var(--verde-detalhe2);
+    text-align: center;
+    transition: color 0.3s ease;
+}
+
+.denuncia-etapa--ativa .denuncia-etapa-texto {
+    color: var(--verde-primario);
+}
+
+.denuncia-etapa-linha {
+    position: absolute;
+    top: 5px;
+    left: 55%;
+    right: -45%;
+    height: 2px;
+    background: var(--verde-detalhe);
+    transition: background-color 0.3s ease;
+}
+
+.denuncia-etapa--ativa .denuncia-etapa-linha {
+    background: var(--verde-primario);
+}
+
+/* Lista completa de comentários */
+.denuncia-comentarios {
+    padding: 1rem 1.5rem 0;
+}
+
+.denuncia-comentarios h3 {
+    font-size: 0.95rem;
+    color: var(--texto-dark);
+    margin: 0 0 0.75rem;
+}
+
+.denuncia-comentarios .comment {
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: var(--border-linha);
+}
+
+.denuncia-comentarios .comment:last-child {
+    border-bottom: 0;
+}
+
+/* Campo de comentário fixo embaixo da tela */
+.denuncia-input-fixo {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: var(--border-linha);
+    z-index: 950;
+}
+
+.denuncia-input-fixo input {
+    flex: 1;
+    padding: 0.7rem 1rem;
+    border: var(--border-linha);
+    border-radius: var(--radius-sharp);
+    font-family: var(--fonte-principal);
+    font-size: 0.9rem;
+    background: var(--bege-fundo);
+}
+
+.denuncia-input-fixo input:focus {
+    outline: none;
+    border-color: var(--verde-primario);
+}
+
+.denuncia-input-fixo button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    background: var(--verde-secundario);
+    color: var(--branco);
+    border: 0;
+    border-radius: var(--radius-sharp);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.denuncia-input-fixo button:hover {
+    background: var(--verde-primario);
+}
+
+.denuncia-input-fixo button:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+@media (max-width: 600px) {
+    .denuncia-central {
+        padding: 0 1rem 6rem;
+    }
+    .denuncia-input-fixo {
+        padding: 0.65rem 1rem;
+    }
+}

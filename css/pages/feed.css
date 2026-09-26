@@ -1600,3 +1600,32 @@ body.pagina-feed .stories-bar .story:first-child:active .story-circle .inner {
     background: var(--verde-primario);
     color: var(--branco);
 }
+
+.comment-ver-todos {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.25rem;
+    padding: 0.4rem 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--verde-detalhe2);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.comment-ver-todos:hover {
+    color: var(--verde-primario);
+}
+
+.comment-ver-todos i {
+    font-size: 0.7rem;
+}
+
+.comment-form input {
+    cursor: text;
+}
+
+.post-card {
+    cursor: pointer;
+}

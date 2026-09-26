@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Denúncia · Verde Real</title>
+
+    <!-- FONTES E ÍCONES -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/pages/feed.css">
+    <link rel="stylesheet" href="../css/pages/denuncia.css">
+</head>
+<body class="pagina-feed" onload="hidePreloader()">
+
+    <!-- ============================================================
+         PRELOADER
+         ============================================================ -->
+    <div id="preloader" class="preloader">
+        <div class="preloader__container">
+            <div class="ponto"></div>
+            <div class="ponto"></div>
+            <div class="ponto"></div>
+            <div class="ponto"></div>
+            <div class="troca-gasosa">
+                <p class="particula co2">CO2</p>
+                <p class="particula o2">O2</p>
+            </div>
+            <i class="fa-solid fa-seedling preloader__icone"></i>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         HEADER
+         ============================================================ -->
+    <header class="flex">
+        <div class="logo-box flex">
+            <h1><i class="fa-solid fa-seedling" style="color: var(--verde-primario);"></i> Verde Real</h1>
+        </div>
+        <div class="header-acoes flex">
+            <button type="button" class="vr-menu-toggle" id="vrMenuToggle"
+                    aria-label="Abrir menu" aria-expanded="false" aria-controls="vrMenuPanel">
+                <i class="fas fa-bars" aria-hidden="true"></i>
+            </button>
+        </div>
+        <nav class="nav-links flex" id="vrMenuPanel">
+            <a href="index.html">Início</a>
+            <a href="selo.html">Selo Verde</a>
+            <a href="sobre.html">Sobre nós</a>
+            <a href="#" id="perfilLink">Meu Perfil</a>
+            <a href="login.html" class="btn-login" id="logoutBtn">Sair</a>
+        </nav>
+    </header>
+
+    <!-- ============================================================
+         DENÚNCIA (post único)
+         ============================================================ -->
+    <main class="denuncia-central">
+        <div class="denuncia-topo">
+            <button type="button" class="denuncia-voltar" id="denunciaVoltar" aria-label="Voltar">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2>Denúncia</h2>
+            <span class="denuncia-topo-espaco" aria-hidden="true"></span>
+        </div>
+
+        <div id="denuncia-conteudo">
+            <p style="text-align:center;color:var(--verde-detalhe2);padding:3rem 1rem;">
+                <i class="fas fa-spinner fa-spin"></i> Carregando denúncia...
+            </p>
+        </div>
+    </main>
+
+    <div class="denuncia-input-fixo" id="denuncia-input-fixo" style="display:none;">
+        <input type="text" id="denuncia-comment-input" placeholder="Escreva um comentário...">
+        <button type="button" id="denuncia-comment-enviar" aria-label="Enviar comentário">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+
+    <!-- ============================================================
+         SCRIPTS - ORDEM CORRETA
+         ============================================================ -->
+
+    <!-- 1. Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- 2. Configuração do Supabase -->
+    <script src="../js/supabase/supabase-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/verde-real/verde-real-core@main/dist/index.global.js"></script>
+
+    <!-- 3. Banco de dados -->
+    <script src="../js/supabase/db-supabase.js"></script>
+
+    <!-- 4. Autenticação -->
+    <script src="../js/supabase/auth-supabase.js"></script>
+
+    <!-- 5. Feed -->
+    <script src="../js/supabase/feed-supabase.js"></script>
+
+    <!-- 6. Card do post + menu do header -->
+    <script src="../js/post-card.js"></script>
+    <script src="../js/menu-header.js"></script>
+    <script src="../js/notificacoes.js"></script>
+
+    <!-- 7. Controlador desta página -->
+    <script src="../js/denuncia.js"></script>
+
+    <script>
+        function hidePreloader() {
+            const pre = document.getElementById('preloader');
+            if (pre) setTimeout(() => pre.classList.add('preloader--escondido'), 400);
+        }
+
+        document.getElementById('denunciaVoltar').addEventListener('click', function () {
+            if (document.referrer && document.referrer.indexOf(window.location.host) !== -1) {
+                history.back();
+            } else {
+                window.location.href = 'feed-cliente.html';
+            }
+        });
+
+        document.getElementById('perfilLink').addEventListener('click', function (e) {
+            e.preventDefault();
+            window.location.href = 'feed-cliente.html';
+        });
+    </script>
+</body>
+</html>
