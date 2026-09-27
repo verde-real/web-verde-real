@@ -3,6 +3,23 @@
 // (html/escolher-username.html)
 // ============================================================
 
+// ============================================================
+// escolher-username.js - Controlador da tela obrigatória de @
+// (html/escolher-username.html)
+// ============================================================
+
+// Página não carrega main-supabase.js (pra não duplicar o botão
+// "Sair" do header), então define aqui só o essencial do preloader.
+function hidePreloader() {
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        preloader.classList.add('preloader--escondido');
+        setTimeout(() => {
+            preloader.style.display = 'none';
+        }, 500);
+    }
+}
+
 class EscolherUsernameController {
     constructor() {
         this.user = null;
