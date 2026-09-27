@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escolha seu @ · Verde Real</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/pages/feed.css">
+    <link rel="stylesheet" href="../css/pages/username.css">
+</head>
+<body class="pagina-feed" onload="hidePreloader()">
+
+    <div id="preloader" class="preloader">
+        <div class="preloader__container">
+            <div class="ponto"></div>
+            <div class="ponto"></div>
+            <div class="ponto"></div>
+            <div class="ponto"></div>
+            <div class="troca-gasosa">
+                <p class="particula co2">CO2</p>
+                <p class="particula o2">O2</p>
+            </div>
+            <i class="fa-solid fa-seedling preloader__icone"></i>
+        </div>
+    </div>
+
+    <header class="flex">
+        <div class="logo-box flex">
+            <h1><i class="fa-solid fa-seedling" style="color: var(--verde-primario);"></i> Verde Real</h1>
+        </div>
+        <nav class="nav-links flex">
+            <a href="login.html" class="btn-login" id="logoutBtnEscolher">Sair</a>
+        </nav>
+    </header>
+
+    <main class="username-central">
+        <h2 class="username-titulo">Escolha seu @</h2>
+        <p class="username-subtitulo">
+            É assim que as pessoas vão te encontrar no Verde Real. Escolha com cuidado — minúsculo, sem espaço, igual Instagram ou TikTok.
+        </p>
+
+        <form id="usernameForm">
+            <div class="username-campo">
+                <span class="username-arroba">@</span>
+                <input
+                    type="text"
+                    id="usernameInput"
+                    placeholder="seunome"
+                    maxlength="24"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    required
+                >
+            </div>
+            <p class="username-feedback" id="usernameFeedback"></p>
+
+            <button type="submit" class="btn-acao btn--escuro" id="usernameSubmitBtn" style="width:100%;">
+                Confirmar @
+            </button>
+        </form>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase/supabase-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/verde-real/verde-real-core@main/dist/index.global.js"></script>
+    <script src="../js/supabase/auth-supabase.js"></script>
+    <script src="../js/escolher-username.js"></script>
+
+</body>
+</html>

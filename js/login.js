@@ -93,6 +93,11 @@ class LoginManager {
     redirecionarPorTipo(usuario) {
         if (!usuario) return;
 
+        if (typeof VerdeRealCore !== 'undefined' && VerdeRealCore.precisaEscolherUsername(usuario)) {
+            window.location.href = 'escolher-username.html';
+            return;
+        }
+
         if (usuario.tipo === 'empresa' || usuario.tipo === 'empresa_selo') {
             window.location.href = 'feed-empresa.html';
         } else {

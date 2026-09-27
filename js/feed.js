@@ -134,7 +134,7 @@ class FeedManager {
                     <i class="fas fa-info-circle"></i>
                     <h3>Nenhuma publicação encontrada</h3>
                     <p>Seja o primeiro a publicar algo!</p>
-                    <button onclick="document.getElementById('form-empresa')?.focus()" class="btn-acao btn--escuro" style="margin-top:1rem;">
+                    <button onclick="window.location.href='publicar.html'" class="btn-acao btn--escuro" style="margin-top:1rem;">
                         <i class="fas fa-plus-circle"></i> Nova Publicação
                     </button>
                 </div>
@@ -218,12 +218,6 @@ class FeedManager {
                 clearTimeout(buscaTimeout);
                 buscaTimeout = setTimeout(() => this.aplicarFiltrosUI(), 350);
             });
-        }
-
-        // Botão de publicar
-        const publicarBtn = document.getElementById('publicarDenunciaBtn');
-        if (publicarBtn) {
-            publicarBtn.addEventListener('click', () => this.publicarPost());
         }
 
         // Logout
@@ -541,70 +535,6 @@ class FeedManager {
         } catch (error) {
             console.error('❌ Erro ao excluir:', error);
             alert(error.message || 'Erro ao excluir publicação.');
-        }
-    }
-
-    // ============================================================
-    // PUBLICAR POST
-    // ============================================================
-        async publicarPost() {
-        const empresaInput = document.getElementById('form-empresa');
-        const descInput = document.getElementById('form-desc');
-        const tipoSelect = document.getElementById('tipoPublicacao');
-        const imagemInput = document.getElementById('form-imagem');
-
-        const titulo = empresaInput ? empresaInput.value.trim() : '';
-        const descricao = descInput ? descInput.value.trim() : '';
-        const tipo = tipoSelect ? tipoSelect.value : 'Outro';
-
-        if (!descricao) {
-            alert('Descreva a denúncia!');
-            return;
-        }
-        if (!this.user) {
-            alert('Faça login para publicar!');
-            return;
-        }
-
-        const btn = document.getElementById('publicarDenunciaBtn');
-        if (btn) {
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publicando...';
-        }
-
-        try {
-            if (typeof feed === 'undefined') {
-                alert('Erro: FeedService não disponível.');
-                return;
-            }
-
-            let midiaUrl = null;
-            if (imagemInput && imagemInput.files && imagemInput.files[0]) {
-                midiaUrl = await feed.enviarMidia(this.user.id, imagemInput.files[0]);
-            }
-
-            const novoPost = await feed.criarPublicacao(titulo, descricao, tipo, titulo || null, midiaUrl);
-
-            if (novoPost) {
-                if (empresaInput) empresaInput.value = '';
-                if (descInput) descInput.value = '';
-                if (imagemInput) imagemInput.value = '';
-
-                await this.carregarPosts();
-                this.renderizarFeed();
-                this.atualizarRanking();
-                this.atualizarPerfil();
-
-                alert('✅ Publicação criada com sucesso!');
-            }
-        } catch (error) {
-            console.error('❌ Erro ao publicar:', error);
-            alert(error.message || 'Erro ao criar publicação.');
-        } finally {
-            if (btn) {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Publicar';
-            }
         }
     }
 

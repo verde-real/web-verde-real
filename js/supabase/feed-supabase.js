@@ -38,6 +38,7 @@ class FeedService {
             data: post.criadoEm,
             usuario_id: post.autor.id,
             usuario_nome: post.autor.nome,
+            usuario_username: post.autor.username,
             usuario_avatar: post.autor.avatarUrl,
             curtidas: post.totalCurtidas,
             comentarios_count: 0, // o core não traz esse count ainda; recarregado ao abrir o post

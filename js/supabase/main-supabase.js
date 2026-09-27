@@ -240,35 +240,45 @@ document.addEventListener('DOMContentLoaded', function() {
     // ============================================================
     // 4.4. VERIFICAR REDIRECIONAMENTOS
     // ============================================================
-    const currentPath = window.location.pathname;
+        const currentPath = window.location.pathname;
     const isLoginPage = currentPath.includes('login.html');
     const isFeedPage = currentPath.includes('feed-');
+    const isPublicarPage = currentPath.includes('publicar.html');
 
     // Verificar se é página de login e já está logado
     if (isLoginPage) {
         setTimeout(() => {
             if (typeof auth !== 'undefined' && auth.isLogado()) {
                 const user = auth.getUsuarioLogado();
-                const target = user.tipo === 'empresa' || user.tipo === 'empresa_selo' 
-                    ? 'feed-empresa.html' 
-                    : 'feed-cliente.html';
                 // Só redireciona se não tiver parâmetro de recuperação
                 if (!window.location.search.includes('recuperar')) {
+                    if (typeof VerdeRealCore !== 'undefined' && VerdeRealCore.precisaEscolherUsername(user)) {
+                        window.location.href = 'escolher-username.html';
+                        return;
+                    }
+                    const target = user.tipo === 'empresa' || user.tipo === 'empresa_selo'
+                        ? 'feed-empresa.html'
+                        : 'feed-cliente.html';
                     window.location.href = target;
                 }
             }
         }, 500);
     }
 
-    // Verificar se é página de feed e não está logado
-    if (isFeedPage) {
+    // Verificar se é página de feed/publicar: exige login e, faltando, o @ escolhido
+    if (isFeedPage || isPublicarPage) {
         setTimeout(() => {
             if (typeof auth === 'undefined' || !auth.isLogado()) {
                 window.location.href = 'login.html';
+                return;
+            }
+            const user = auth.getUsuarioLogado();
+            if (typeof VerdeRealCore !== 'undefined' && VerdeRealCore.precisaEscolherUsername(user)) {
+                window.location.href = 'escolher-username.html';
             }
         }, 500);
     }
-
+    
     // ============================================================
     // 4.5. ESCUTAR MUDANÇAS DE AUTENTICAÇÃO (múltiplas abas)
     // ============================================================

@@ -63,7 +63,7 @@
             
             <!-- Stories bar -->
             <div class="stories-bar">
-                <div class="story" onclick="document.getElementById('form-empresa').focus()">
+                <div class="story" onclick="window.location.href='publicar.html'">
                     <div class="story-circle"><div class="inner"><i class="fas fa-plus-circle"></i></div></div>
                     <span>Denunciar</span>
                 </div>
@@ -117,27 +117,6 @@
 
         <!-- ======================== SIDEBAR ======================== -->
         <aside class="sidebar">
-            
-            <!-- Publicar Denúncia -->
-            <div class="sidebar-card">
-                <h3><i class="fas fa-bullhorn"></i> Denunciar Greenwashing</h3>
-                <input type="text" id="form-empresa" placeholder="Nome da empresa (opcional)" list="listaEmpresas">
-                <datalist id="listaEmpresas"></datalist>
-                <textarea id="form-desc" rows="3" placeholder="Descreva a prática enganosa..."></textarea>
-                <input type="file" id="form-imagem" accept="image/*" style="width:100%; margin-bottom:0.75rem; font-size:0.85rem;">
-                <select id="tipoPublicacao" style="width:100%; padding:0.75rem 1rem; border: var(--border-linha); background: var(--bege-fundo); margin-bottom:1rem; font-size:0.9rem;">
-                    <option value="Desmatamento">Desmatamento</option>
-                    <option value="Poluição">Poluição</option>
-                    <option value="Queimada">Queimada</option>
-                    <option value="Descarte Irregular">Descarte Irregular</option>
-                    <option value="Água">Água</option>
-                    <option value="Fauna">Fauna</option>
-                    <option value="Outro">Outro</option>
-                </select>
-                <button class="btn-submit" id="publicarDenunciaBtn">
-                    <i class="fas fa-paper-plane"></i> Publicar
-                </button>
-            </div>
 
             <!-- Ranking -->
             <div class="sidebar-card">

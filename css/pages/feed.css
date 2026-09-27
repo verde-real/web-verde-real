@@ -280,6 +280,12 @@
     font-size: 0.85rem;
 }
 
+.post-user-name .post-user-username {
+    font-weight: 400;
+    font-size: 0.8rem;
+    color: var(--verde-detalhe2);
+}
+
 .post-empresa-info {
     display: flex;
     align-items: center;
@@ -1458,8 +1464,6 @@ body.pagina-feed .feed-wrapper {
 }
 
 /* Alvos de scroll não ficam sob header + barra */
-body.pagina-feed #form-empresa,
-body.pagina-feed #form-desc,
 body.pagina-feed #form-selo,
 body.pagina-feed #ranking-container,
 body.pagina-feed #perfilCard {

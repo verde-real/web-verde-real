@@ -58,6 +58,7 @@ function renderizarPostCard(post, usuarioAtual, opcoes) {
                     <div class="post-user-info">
                         <div class="post-user-name">
                             ${post.usuario_nome}
+                            ${post.usuario_username ? `<span class="post-user-username">@${post.usuario_username}</span>` : ''}
                             ${post.temSelo ? '<i class="fas fa-check-circle verified-badge" style="color:var(--verde-primario);"></i>' : ''}
                             ${isNovo ? '<span class="badge" style="background:var(--dourado);color:#fff;font-size:0.6rem;padding:0.1rem 0.5rem;">NOVO</span>' : ''}
                         </div>

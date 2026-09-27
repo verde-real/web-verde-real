@@ -115,6 +115,10 @@ function cardPost(p) {
 function renderizarPerfil({ perfil, ehEmpresa, selos, totalSeguidores, totalSeguindo, postsProprios, postsVinculados, jaSegue, usuarioLogado, ehMeuPerfil, postsSalvos }) {
     const container = document.getElementById('perfil-container');
     const seloAtivo = selos.find((s) => s.status === 'ativo');
+    const nomeExibicaoHTML = perfil.username
+        ? `<h2 style="margin:0.75rem 0 0.25rem;">@${perfil.username}</h2>
+           <p style="font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--verde-detalhe2);margin:0 0 0.5rem;">${perfil.nome}</p>`
+        : `<h2 style="margin:0.75rem 0 0.5rem;">${perfil.nome}</h2>`;
 
     const avatarHTML = perfil.avatar_url
         ? `<img src="${perfil.avatar_url}" class="post-avatar" style="width:80px;height:80px;object-fit:cover;">`
@@ -139,7 +143,7 @@ function renderizarPerfil({ perfil, ehEmpresa, selos, totalSeguidores, totalSegu
     container.innerHTML = `
         <div class="sidebar-card" style="text-align:center;">
             ${avatarHTML}
-            <h2 style="margin:0.75rem 0 0.5rem;">${perfil.nome}</h2>
+            ${nomeExibicaoHTML}
             <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:0.5rem;">
                 ${tipoBadge}
                 ${seloHTML}
