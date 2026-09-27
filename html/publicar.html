@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publicar denúncia · Verde Real</title>
+
+    <!-- FONTES E ÍCONES -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/pages/feed.css">
+    <link rel="stylesheet" href="../css/pages/denuncia.css">
+    <link rel="stylesheet" href="../css/pages/publicar.css">
+</head>
+<body class="pagina-feed" onload="hidePreloader()">
+
+    <!-- ============================================================
+         PRELOADER
+         ============================================================ -->
+    <div id="preloader" class="preloader">
+        <div class="preloader__container">
+            <div class="ponto"></div>
+            <div class="ponto"></div>
+            <div class="ponto"></div>
+            <div class="ponto"></div>
+            <div class="troca-gasosa">
+                <p class="particula co2">CO2</p>
+                <p class="particula o2">O2</p>
+            </div>
+            <i class="fa-solid fa-seedling preloader__icone"></i>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         HEADER
+         ============================================================ -->
+    <header class="flex">
+        <div class="logo-box flex">
+            <h1><i class="fa-solid fa-seedling" style="color: var(--verde-primario);"></i> Verde Real</h1>
+        </div>
+        <div class="header-acoes flex">
+            <button type="button" class="vr-menu-toggle" id="vrMenuToggle"
+                    aria-label="Abrir menu" aria-expanded="false" aria-controls="vrMenuPanel">
+                <i class="fas fa-bars" aria-hidden="true"></i>
+            </button>
+        </div>
+        <nav class="nav-links flex" id="vrMenuPanel">
+            <a href="index.html">Início</a>
+            <a href="selo.html">Selo Verde</a>
+            <a href="sobre.html">Sobre nós</a>
+            <a href="login.html" class="btn-login" id="logoutBtn">Sair</a>
+        </nav>
+    </header>
+
+    <!-- ============================================================
+         PUBLICAR / EDITAR DENÚNCIA
+         ============================================================ -->
+    <main class="denuncia-central publicar-central">
+        <div class="denuncia-topo">
+            <button type="button" class="denuncia-voltar" id="publicarVoltar" aria-label="Voltar">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2 id="publicarTitulo">Nova denúncia</h2>
+            <span class="denuncia-topo-espaco" aria-hidden="true"></span>
+        </div>
+
+        <p class="publicar-subtitulo" id="publicarSubtitulo">
+            Descreva o que você presenciou. Fotos, vídeos e localização ajudam a fiscalização a agir mais rápido.
+        </p>
+
+        <form id="publicarForm" novalidate>
+
+            <textarea
+                id="publicarDescricao"
+                class="publicar-textarea"
+                rows="5"
+                placeholder="O que está acontecendo e onde?"
+                required
+            ></textarea>
+
+            <div class="publicar-secao">
+                <span class="publicar-rotulo">Categoria</span>
+                <div class="publicar-chips" id="publicarCategorias">
+                    <button type="button" class="publicar-chip" data-categoria="Desmatamento">Desmatamento</button>
+                    <button type="button" class="publicar-chip" data-categoria="Poluição">Poluição</button>
+                    <button type="button" class="publicar-chip" data-categoria="Queimada">Queimada</button>
+                    <button type="button" class="publicar-chip" data-categoria="Descarte Irregular">Descarte Irregular</button>
+                    <button type="button" class="publicar-chip" data-categoria="Água">Água</button>
+                    <button type="button" class="publicar-chip" data-categoria="Fauna">Fauna</button>
+                    <button type="button" class="publicar-chip" data-categoria="Outro">Outro</button>
+                </div>
+            </div>
+
+            <div class="publicar-secao">
+                <span class="publicar-rotulo">Empresa denunciada (opcional)</span>
+                <div class="publicar-empresa-box" id="publicarEmpresaBox">
+                    <input
+                        type="text"
+                        id="publicarEmpresaBusca"
+                        placeholder="Buscar empresa pelo nome..."
+                        autocomplete="off"
+                    >
+                    <div class="publicar-empresa-resultados" id="publicarEmpresaResultados"></div>
+                    <div class="publicar-empresa-escolhida" id="publicarEmpresaEscolhida" style="display:none;">
+                        <i class="fas fa-building"></i>
+                        <span id="publicarEmpresaNome"></span>
+                        <button type="button" id="publicarEmpresaRemover" aria-label="Remover empresa selecionada">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="publicar-secao">
+                <span class="publicar-rotulo">Prova (opcional)</span>
+
+                <div class="publicar-midia-preview" id="publicarMidiaPreview" style="display:none;">
+                    <img id="publicarMidiaImg" alt="Prévia da imagem anexada" style="display:none;">
+                    <video id="publicarMidiaVideo" controls style="display:none;"></video>
+                    <button type="button" id="publicarMidiaRemover" class="publicar-midia-remover" aria-label="Remover mídia">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </div>
+
+                <label class="publicar-anexar" id="publicarAnexarLabel" for="publicarMidiaInput">
+                    <i class="fas fa-camera"></i>
+                    <span>Adicionar foto ou vídeo</span>
+                </label>
+                <input type="file" id="publicarMidiaInput" accept="image/*,video/*" hidden>
+            </div>
+
+            <button type="button" class="publicar-localizacao" id="publicarLocalizacaoToggle">
+                <i class="fas fa-square" id="publicarLocalizacaoIcone"></i>
+                <span>Anexar minha localização atual</span>
+            </button>
+            <p class="publicar-localizacao-status" id="publicarLocalizacaoStatus"></p>
+
+            <button type="submit" class="btn-acao btn--escuro publicar-submit" id="publicarSubmitBtn">
+                <i class="fas fa-paper-plane"></i>
+                <span id="publicarSubmitTexto">Publicar denúncia</span>
+            </button>
+        </form>
+    </main>
+
+    <!-- ============================================================
+         SCRIPTS - ORDEM CORRETA
+         ============================================================ -->
+
+    <!-- 1. Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- 2. Configuração do Supabase -->
+    <script src="../js/supabase/supabase-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/verde-real/verde-real-core@main/dist/index.global.js"></script>
+
+    <!-- 3. Banco de dados -->
+    <script src="../js/supabase/db-supabase.js"></script>
+
+    <!-- 4. Autenticação -->
+    <script src="../js/supabase/auth-supabase.js"></script>
+
+    <!-- 5. Feed (serviço de posts/empresas/upload) -->
+    <script src="../js/supabase/feed-supabase.js"></script>
+
+    <!-- 6. Header (menu hamburguer + Sair) -->
+    <script src="../js/supabase/main-supabase.js"></script>
+    <script src="../js/menu-header.js"></script>
+
+    <!-- 7. Controlador desta página -->
+    <script src="../js/publicar.js"></script>
+
+</body>
+</html>

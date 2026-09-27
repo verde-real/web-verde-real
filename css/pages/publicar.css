@@ -1,0 +1,257 @@
+/* ============================================================
+   publicar.css - Página dedicada de criar/editar denúncia
+   Reaproveita os tokens de global.css e a estrutura de topo de
+   denuncia.css (.denuncia-central / .denuncia-topo / .denuncia-voltar).
+   ============================================================ */
+
+.publicar-central {
+    max-width: 640px;
+}
+
+.publicar-subtitulo {
+    color: var(--verde-detalhe2);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 1.75rem;
+}
+
+.publicar-textarea {
+    width: 100%;
+    min-height: 130px;
+    padding: 1rem;
+    border: var(--border-linha);
+    background: var(--branco);
+    font-family: var(--fonte-principal);
+    font-size: 0.95rem;
+    color: var(--texto-dark);
+    resize: vertical;
+    margin-bottom: 1.75rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.publicar-textarea:focus {
+    outline: none;
+    border-color: var(--verde-primario);
+    box-shadow: 0 0 0 3px rgba(64, 122, 108, 0.1);
+}
+
+.publicar-secao {
+    margin-bottom: 1.75rem;
+}
+
+.publicar-rotulo {
+    display: block;
+    font-family: var(--fonte-mono);
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--verde-secundario);
+    margin-bottom: 0.75rem;
+}
+
+/* ---- Chips de categoria ---- */
+.publicar-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.publicar-chip {
+    padding: 0.55rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-family: var(--fonte-principal);
+    background: var(--branco);
+    color: var(--texto-dark);
+    border: var(--border-linha);
+    border-radius: var(--radius-sharp);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.publicar-chip:hover {
+    border-color: var(--verde-primario);
+}
+
+.publicar-chip.publicar-chip--ativo {
+    background: var(--verde-secundario);
+    border-color: var(--verde-secundario);
+    color: var(--branco);
+}
+
+/* ---- Empresa denunciada ---- */
+.publicar-empresa-box {
+    border: var(--border-linha);
+    background: var(--branco);
+    padding: 1rem;
+}
+
+.publicar-empresa-box input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-family: var(--fonte-principal);
+    font-size: 0.9rem;
+    color: var(--texto-dark);
+    padding: 0.25rem 0;
+}
+
+.publicar-empresa-box input:focus {
+    outline: none;
+}
+
+.publicar-empresa-resultados:not(:empty) {
+    margin-top: 0.5rem;
+    border-top: var(--border-linha);
+}
+
+.publicar-empresa-resultado {
+    padding: 0.65rem 0.25rem;
+    font-size: 0.9rem;
+    color: var(--texto-dark);
+    cursor: pointer;
+    border-bottom: 1px solid rgba(48, 87, 80, 0.1);
+}
+
+.publicar-empresa-resultado:hover {
+    color: var(--verde-primario);
+}
+
+.publicar-empresa-escolhida {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.9rem;
+    color: var(--texto-dark);
+}
+
+.publicar-empresa-escolhida i.fa-building {
+    color: var(--verde-primario);
+}
+
+.publicar-empresa-escolhida span {
+    flex: 1;
+    font-weight: 600;
+}
+
+.publicar-empresa-escolhida button {
+    background: none;
+    border: none;
+    color: var(--verde-detalhe2);
+    font-size: 1.1rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.publicar-empresa-escolhida button:hover {
+    color: var(--verde-secundario);
+}
+
+/* ---- Mídia (prova) ---- */
+.publicar-anexar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 1.1rem;
+    border: 1px dashed rgba(48, 87, 80, 0.35);
+    background: var(--bege-fundo);
+    color: var(--verde-secundario);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.publicar-anexar:hover {
+    border-color: var(--verde-primario);
+    background: var(--verde-claro);
+}
+
+.publicar-midia-preview {
+    position: relative;
+    margin-bottom: 0.85rem;
+}
+
+.publicar-midia-preview img,
+.publicar-midia-preview video {
+    width: 100%;
+    max-height: 320px;
+    object-fit: cover;
+    border: var(--border-linha);
+    background: #000;
+}
+
+.publicar-midia-remover {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: var(--branco);
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #c0392b;
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+
+/* ---- Localização ---- */
+.publicar-localizacao {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    width: 100%;
+    padding: 1rem;
+    background: var(--branco);
+    border: var(--border-linha);
+    font-family: var(--fonte-principal);
+    font-size: 0.9rem;
+    color: var(--texto-dark);
+    cursor: pointer;
+    margin-bottom: 0.4rem;
+}
+
+.publicar-localizacao i {
+    color: var(--verde-primario);
+    font-size: 1rem;
+}
+
+.publicar-localizacao.publicar-localizacao--ativa i:before {
+    content: "\f14a"; /* fa-check-square */
+}
+
+.publicar-localizacao-status {
+    font-size: 0.8rem;
+    color: var(--verde-detalhe2);
+    margin-bottom: 1.75rem;
+    min-height: 1em;
+}
+
+/* ---- Botão publicar ---- */
+.publicar-submit {
+    width: 100%;
+    margin-bottom: 3rem;
+}
+
+.publicar-submit:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+@media (max-width: 600px) {
+    .publicar-chips {
+        gap: 0.5rem;
+    }
+    .publicar-chip {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.7rem;
+    }
+}

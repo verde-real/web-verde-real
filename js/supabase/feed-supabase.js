@@ -33,6 +33,8 @@ class FeedService {
             empresa_id: post.empresaId,
             status_denuncia: post.status,
             midia_url: post.midiaUrl,
+            latitude: post.latitude,
+            longitude: post.longitude,
             data: post.criadoEm,
             usuario_id: post.autor.id,
             usuario_nome: post.autor.nome,
@@ -92,7 +94,7 @@ class FeedService {
     // ============================================================
     // CRIAR / EDITAR / EXCLUIR
     // ============================================================
-    async criarPublicacao(titulo, descricao, tipo = 'Outro', empresaAlvo = null, midiaUrl = null) {
+    async criarPublicacao(titulo, descricao, tipo = 'Outro', empresaAlvo = null, midiaUrl = null, opcoes = {}) {
         if (!this.auth || !this.auth.isLogado()) {
             throw new Error('Você precisa estar logado para publicar.');
         }
@@ -103,8 +105,11 @@ class FeedService {
         const usuario = this.auth.getUsuarioLogado();
         const servico = VerdeRealCore.criarServicoPosts(this.supabase);
 
-        let empresaId = null;
-        if (empresaAlvo) {
+        // Prioriza o ID explícito (quando a empresa foi escolhida numa lista
+        // de resultados); só busca por nome se nenhum ID foi informado —
+        // mantém compatível com quem ainda chama passando só o nome.
+        let empresaId = opcoes.empresaId || null;
+        if (!empresaId && empresaAlvo) {
             const encontradas = await servico.buscarEmpresas(empresaAlvo);
             if (encontradas.length > 0) empresaId = encontradas[0].id;
         }
@@ -116,7 +121,9 @@ class FeedService {
                 categoria: tipo || 'Outro',
                 empresaId,
                 midiaUrl,
-                tipoMidia: midiaUrl ? 'imagem' : null,
+                tipoMidia: opcoes.tipoMidia || (midiaUrl ? 'imagem' : null),
+                latitude: opcoes.latitude ?? null,
+                longitude: opcoes.longitude ?? null,
             });
 
             const post = this.formatarPostParaUI(postCriado);
