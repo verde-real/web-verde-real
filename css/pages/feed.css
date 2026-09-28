@@ -22,7 +22,7 @@
     padding: 0 var(--pad-lateral);
     display: grid;
     grid-template-columns: 1fr 360px;
-    gap: 2.5rem;
+    gap: 2.5rem;j
 }
 
 .feed-central {
@@ -1264,10 +1264,39 @@
    14. HEADER COM MENU HAMBURGER + NAVEGAÇÃO FIXA (SOMENTE FEEDS)
    Escopo: body.pagina-feed  (perfil/notificações não são afetados)
    ============================================================ */
-body.pagina-feed {
-    --vr-header-h: 72px;   /* altura fixa do header nos feeds */
-    --vr-nav-h: 84px;      /* altura da barra horizontal (mobile) */
-    --vr-offset-topo: calc(var(--vr-header-h) + var(--vr-nav-h) + 16px);
+body.pagina-feed .header-acoes .sino-btn {
+    padding: 10px;
+    font-size: 1.15rem;
+}
+
+.avatar-header {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--verde-claro);
+    color: var(--verde-secundario);
+    font-weight: bold;
+    font-size: 1rem;
+    text-decoration: none;
+    flex-shrink: 0;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.avatar-header:hover {
+    border-color: var(--verde-primario);
+    transform: scale(1.05);
+}
+
+.avatar-header img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 /* ---------- 14.1 Header em linha única ---------- */
@@ -1477,6 +1506,10 @@ body.pagina-feed #perfilCard {
     }
     body.pagina-feed .header-acoes .sino-painel {
         right: var(--pad-lateral);
+    }
+    .avatar-header {
+        width: 34px;
+        height: 34px;
     }
 }
 
