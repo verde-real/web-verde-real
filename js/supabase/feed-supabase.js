@@ -354,6 +354,24 @@ class FeedService {
         }
     }
 
+    async atualizarAvatar(usuarioId, avatarUrl) {
+        if (!this.auth || !this.auth.isLogado()) throw new Error('Você precisa estar logado.');
+        try {
+            const { data, error } = await this.supabase
+                .from('profiles')
+                .update({ avatar_url: avatarUrl })
+                .eq('id', usuarioId)
+                .select()
+                .single();
+            if (error) throw new Error('Erro ao atualizar avatar: ' + error.message);
+            console.log('✅ Avatar atualizado!');
+            return data;
+        } catch (error) {
+            console.error('❌ Erro ao atualizar avatar:', error);
+            throw error;
+        }
+    }
+
     // ============================================================
     // ESTATÍSTICAS (usadas na home)
     // ============================================================
