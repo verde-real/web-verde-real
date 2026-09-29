@@ -227,9 +227,9 @@ async function trocarAvatar(file) {
 function configurarSair() {
     const btn = document.getElementById('btnSairConta');
     if (!btn) return;
-    btn.addEventListener('click', function () {
+    btn.addEventListener('click', async function () {
         if (typeof auth !== 'undefined' && auth.logout) {
-            auth.logout();
+            await auth.logout();
         }
         window.location.href = 'login.html';
     });
