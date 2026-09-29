@@ -25,8 +25,8 @@
         </nav>
     </header>
 
-    <div class="feed-wrapper" style="justify-content:center;">
-        <div class="feed-central" style="max-width:600px;">
+    <div class="feed-wrapper">
+        <div class="feed-central">
             <div id="meu-perfil-container">
                 <div class="mensagem-feed">
                     <i class="fas fa-spinner fa-spin"></i>
@@ -34,6 +34,25 @@
                 </div>
             </div>
         </div>
+
+        <aside class="sidebar">
+            <div class="sidebar-card">
+                <h3><i class="fas fa-user-cog"></i> Minha conta</h3>
+                <ul class="conta-lista">
+                    <li class="conta-lista-item desabilitado">
+                        <i class="fas fa-cog"></i> Configurações
+                        <span class="em-breve">em breve</span>
+                    </li>
+                    <li class="conta-lista-item desabilitado">
+                        <i class="fas fa-lock"></i> Alterar senha
+                        <span class="em-breve">em breve</span>
+                    </li>
+                    <li class="conta-lista-item sair" id="btnSairConta">
+                        <i class="fas fa-sign-out-alt"></i> Sair da conta
+                    </li>
+                </ul>
+            </div>
+        </aside>
     </div>
 
     <input type="file" id="inputAvatar" accept="image/*" style="display:none;">
