@@ -1,17 +1,25 @@
 // ============================================================
 // meu-perfil.js - Perfil próprio (área logada do usuário)
 // Reaproveita: auth-supabase.js, feed-supabase.js (getPublicacoesByUsuario,
-// toggleLike, deletarPublicacao, enviarMidia, atualizarAvatar) e
-// post-card.js (renderizarPostCard, abrirPerfilUsuario).
+// toggleLike, deletarPublicacao, enviarMidia, atualizarAvatar), post-card.js
+// (renderizarPostCard) e VerdeRealCore.criarServicoSeguidores (contagem).
+// Layout reorganizado (saudação + estatísticas + CTA + conta), mas usando
+// só classes já existentes no site: welcome-banner, sidebar-card, badge,
+// btn-acao/btn--escuro, mensagem-feed — sem canto arredondado nem sombra
+// nova, pra manter a identidade visual atual do Verde Real.
 // ============================================================
 
 let postsCache = [];
 
+function primeiroNome(nomeCompleto) {
+    return (nomeCompleto || '').trim().split(' ')[0] || 'usuário';
+}
+
 function nomeExibicaoHTML(usuario) {
     return usuario.username
-        ? `<h2 style="margin:0.75rem 0 0.25rem;">@${usuario.username}</h2>
-           <p style="font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--verde-detalhe2);margin:0 0 0.5rem;">${usuario.nome}</p>`
-        : `<h2 style="margin:0.75rem 0 0.5rem;">${usuario.nome}</h2>`;
+        ? `<h2 style="margin:0 0 0.15rem;">@${usuario.username}</h2>
+           <p style="font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--verde-detalhe2);margin:0 0 0.4rem;">${usuario.nome}</p>`
+        : `<h2 style="margin:0 0 0.4rem;">${usuario.nome}</h2>`;
 }
 
 function avatarHTML(usuario) {
@@ -20,38 +28,106 @@ function avatarHTML(usuario) {
         : `<div class="post-avatar" style="width:80px;height:80px;font-size:2rem;">${usuario.nome.charAt(0).toUpperCase()}</div>`;
 }
 
+function badgeContaHTML(usuario) {
+    if (usuario.tipo === 'empresa_selo') {
+        return `<span class="badge badge-selo"><i class="fas fa-trophy"></i> Empresa com Selo Verde</span>`;
+    }
+    if (usuario.tipo === 'empresa') {
+        return `<span class="badge badge-info"><i class="fas fa-building"></i> Conta Empresa</span>`;
+    }
+    return `<span class="badge badge-selo"><i class="fas fa-leaf"></i> Guardião Verde</span>`;
+}
+
 function renderizarPerfil(usuario) {
     const container = document.getElementById('meu-perfil-container');
 
     container.innerHTML = `
-        <div class="sidebar-card" style="text-align:center;">
-            <div id="avatarWrapper" style="position:relative;display:inline-block;cursor:pointer;" title="Clique para trocar a foto">
-                ${avatarHTML(usuario)}
-                <div style="position:absolute;bottom:0;right:0;width:28px;height:28px;border-radius:50%;background:var(--verde-primario);color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid #fff;">
-                    <i class="fas fa-camera" style="font-size:0.75rem;"></i>
-                </div>
+        <div class="welcome-banner">
+            <div>
+                <h2><i class="fas fa-hand-sparkles"></i> Olá, ${primeiroNome(usuario.nome)}! 👋</h2>
+                <p>Este é o seu espaço no Verde Real.</p>
             </div>
-            ${nomeExibicaoHTML(usuario)}
-            <p style="font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--verde-detalhe2);">${usuario.email}</p>
         </div>
 
-        <h3 style="margin:1.5rem 0 1rem;"><i class="fas fa-pen"></i> Minhas publicações (<span id="totalPosts">0</span>)</h3>
+        <div class="sidebar-card perfil-topo">
+            <div class="perfil-topo-linha">
+                <div id="avatarWrapper" class="perfil-avatar-wrapper" title="Clique para trocar a foto">
+                    ${avatarHTML(usuario)}
+                    <div class="perfil-avatar-editar"><i class="fas fa-camera"></i></div>
+                </div>
+                <div class="perfil-topo-info">
+                    ${nomeExibicaoHTML(usuario)}
+                    <p style="font-size:0.85rem;color:var(--verde-detalhe2);"><i class="fas fa-envelope"></i> ${usuario.email}</p>
+                    ${badgeContaHTML(usuario)}
+                </div>
+            </div>
+
+            <button class="btn-acao btn--escuro" id="btnEditarPerfil" style="margin-top:1.25rem;">
+                <i class="fas fa-pen"></i> Editar foto de perfil
+            </button>
+
+            <div class="perfil-stats">
+                <div class="perfil-stat">
+                    <i class="fas fa-file-alt"></i>
+                    <strong id="statPosts">0</strong>
+                    <span>Publicações</span>
+                </div>
+                <div class="perfil-stat">
+                    <i class="fas fa-heart"></i>
+                    <strong id="statCurtidas">0</strong>
+                    <span>Curtidas</span>
+                </div>
+                <div class="perfil-stat">
+                    <i class="fas ${usuario.tipo === 'cliente' ? 'fa-building' : 'fa-users'}"></i>
+                    <strong id="statTerceira">0</strong>
+                    <span>${usuario.tipo === 'cliente' ? 'Empresas seguidas' : 'Seguidores'}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-card perfil-cta">
+            <div>
+                <h3><i class="fas fa-pen"></i> Compartilhe algo com a comunidade</h3>
+                <p>Escreva uma ideia, compartilhe uma foto ou conte sua experiência no Verde Real.</p>
+            </div>
+            <button class="btn-acao btn--escuro" onclick="window.location.href='publicar.html'">
+                <i class="fas fa-plus-circle"></i> Criar publicação
+            </button>
+        </div>
+
+        <h3 class="perfil-posts-titulo"><i class="fas fa-file-alt"></i> Minhas publicações (<span id="totalPosts">0</span>)</h3>
         <div id="postsContainer">
             <p style="color:var(--verde-detalhe2);">Carregando publicações...</p>
         </div>
     `;
 
-    document.getElementById('avatarWrapper').addEventListener('click', function () {
-        document.getElementById('inputAvatar').click();
-    });
+    document.getElementById('avatarWrapper').addEventListener('click', abrirSeletorDeArquivo);
+    document.getElementById('btnEditarPerfil').addEventListener('click', abrirSeletorDeArquivo);
+}
+
+function abrirSeletorDeArquivo() {
+    document.getElementById('inputAvatar').click();
 }
 
 function renderizarPosts(posts, usuario) {
     const container = document.getElementById('postsContainer');
     document.getElementById('totalPosts').textContent = posts.length;
+    document.getElementById('statPosts').textContent = posts.length;
+
+    const totalCurtidas = posts.reduce((soma, p) => soma + (p.curtidas || 0), 0);
+    document.getElementById('statCurtidas').textContent = totalCurtidas;
 
     if (posts.length === 0) {
-        container.innerHTML = '<p style="color:var(--verde-detalhe2);">Você ainda não fez nenhuma publicação.</p>';
+        container.innerHTML = `
+            <div class="mensagem-feed">
+                <i class="fas fa-seedling"></i>
+                <h3>Você ainda não fez nenhuma publicação.</h3>
+                <p>Que tal compartilhar algo com a comunidade? Suas ideias também fazem a diferença!</p>
+                <button onclick="window.location.href='publicar.html'" class="btn-acao btn--escuro">
+                    <i class="fas fa-plus-circle"></i> Criar publicação
+                </button>
+            </div>
+        `;
         return;
     }
 
@@ -91,6 +167,8 @@ function renderizarPosts(posts, usuario) {
                 this.innerHTML = `<i class="${resultado.curtido ? 'fas' : 'far'} fa-heart"></i> Curtir`;
                 const post = postsCache.find((p) => p.id === id);
                 if (post) post.curtido = resultado.curtido;
+                document.getElementById('statCurtidas').textContent =
+                    postsCache.reduce((soma, p) => soma + (p.curtidas || 0), 0);
             } catch (error) {
                 console.error(error);
                 alert(error.message || 'Erro ao curtir.');
@@ -98,13 +176,25 @@ function renderizarPosts(posts, usuario) {
         });
     });
 
-    // Clicar no card (fora dos botões/avatar) abre o detalhe — mesmo padrão do feed
     container.querySelectorAll('.post-card').forEach((card) => {
         card.addEventListener('click', function (e) {
             if (e.target.closest('.post-user, .action-btn, a, button')) return;
             window.location.href = `denuncia.html?id=${card.dataset.id}`;
         });
     });
+}
+
+async function carregarTerceiraEstatistica(usuario) {
+    try {
+        const servico = VerdeRealCore.criarServicoSeguidores(window.supabase);
+        const valor = usuario.tipo === 'cliente'
+            ? await servico.contarSeguindo(usuario.id)
+            : await servico.contarSeguidores(usuario.id);
+        const el = document.getElementById('statTerceira');
+        if (el) el.textContent = valor;
+    } catch (error) {
+        console.error('❌ Erro ao carregar contagem de seguidores/seguindo:', error);
+    }
 }
 
 async function trocarAvatar(file) {
@@ -126,11 +216,23 @@ async function trocarAvatar(file) {
 
         renderizarPerfil(usuario);
         renderizarPosts(postsCache, usuario);
+        carregarTerceiraEstatistica(usuario);
     } catch (error) {
         console.error(error);
         alert(error.message || 'Erro ao trocar a foto.');
         avatarWrapper.innerHTML = original;
     }
+}
+
+function configurarSair() {
+    const btn = document.getElementById('btnSairConta');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+        if (typeof auth !== 'undefined' && auth.logout) {
+            auth.logout();
+        }
+        window.location.href = 'login.html';
+    });
 }
 
 async function iniciar() {
@@ -146,6 +248,7 @@ async function iniciar() {
 
     const usuario = window.auth.getUsuarioLogado();
     renderizarPerfil(usuario);
+    configurarSair();
 
     while (!window.feed) {
         await new Promise((r) => setTimeout(r, 100));
@@ -153,6 +256,7 @@ async function iniciar() {
 
     postsCache = await window.feed.getPublicacoesByUsuario(usuario.id);
     renderizarPosts(postsCache, usuario);
+    carregarTerceiraEstatistica(usuario);
 
     document.getElementById('inputAvatar').addEventListener('change', function (e) {
         const file = e.target.files[0];
