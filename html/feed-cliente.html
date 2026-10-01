@@ -217,6 +217,7 @@
     <script src="../js/supabase/main-supabase.js"></script>
     <script src="../js/supabase/notificacoes-supabase.js"></script>
     <script src="../js/notificacoes.js"></script>
+    <script src="../js/avatar-header.js"></script>
     <script src="../js/menu-header.js"></script>
 
     <!-- ============================================================
@@ -255,10 +256,10 @@
                 // Logout
                 const logoutBtn = document.getElementById('logoutBtn');
                 if (logoutBtn) {
-                    logoutBtn.addEventListener('click', function(e) {
+                    logoutBtn.addEventListener('click', async function(e) {
                         e.preventDefault();
                         if (typeof auth !== 'undefined' && auth.logout) {
-                            auth.logout();
+                            await auth.logout();
                         }
                         window.location.href = 'login.html';
                     });
