@@ -9,7 +9,7 @@
             window.notificacoesService.inicializado = true; // notificacoes.js espera essa flag
             console.log('✅ NotificacoesService (core compartilhado) disponível!');
         } else {
-            setTimeout(tentarIniciar, 300);
+            setTimeout(tentarIniciar, 100);
         }
     }
     document.addEventListener('DOMContentLoaded', tentarIniciar);

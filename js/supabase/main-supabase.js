@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function() {
     async function configurarHeaderComAuth() {
     if (typeof auth === 'undefined' || !auth) {
         console.log('⏳ Aguardando AuthService...');
-        setTimeout(configurarHeaderComAuth, 500);
+        setTimeout(configurarHeaderComAuth, 100);
         return;
     }
     if (auth.initPromise) {
@@ -232,8 +232,20 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ Header configurado com autenticação!');
     }
 
-    // Iniciar configuração do header
-    setTimeout(configurarHeaderComAuth, 300);
+// Instantâneo: se há usuário em cache, já mostra "Sair" (sem piscar "Entrar")
+    try {
+        const bruto = localStorage.getItem('verdeRealUsuario') || sessionStorage.getItem('verdeRealUsuario');
+        const cache = bruto ? JSON.parse(bruto) : null;
+        if (cache && cache.nome) {
+            atualizarHeader({
+                isLogado: () => true,
+                getUsuarioLogado: () => cache,
+                logout: () => (window.auth ? window.auth.logout() : Promise.resolve())
+            });
+        }
+    } catch (e) { /* cache inválido: segue o fluxo normal */ }
+
+    configurarHeaderComAuth();
 
     // ============================================================
     // 4.3. MÁSCARAS AUTOMÁTICAS

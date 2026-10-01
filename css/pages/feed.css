@@ -1319,7 +1319,7 @@ body.pagina-feed .logo-box h1 {
 body.pagina-feed .header-acoes {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: clamp(0.75rem, 2vw, 1.25rem);
     margin-left: auto;
 }
 

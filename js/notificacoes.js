@@ -171,25 +171,46 @@
         atualizarBotaoLerTudo();
     }
 
-    async function iniciar() {
-        if (!window.auth || !window.auth.isLogado() || !window.notificacoesService) return;
-        const usuario = window.auth.getUsuarioLogado();
-        if (!usuario) return;
+        function lerUsuarioCache() {
+        try {
+            var bruto = localStorage.getItem('verdeRealUsuario') || sessionStorage.getItem('verdeRealUsuario');
+            var u = bruto ? JSON.parse(bruto) : null;
+            return u && u.id ? u : null;
+        } catch (e) {
+            return null;
+        }
+    }
 
+    function inserirSino() {
         const navLinks = document.querySelector('.nav-links');
         if (!navLinks || document.getElementById('sinoNotificacoes')) return;
 
         const estrutura = criarEstrutura();
         const headerAcoes = document.querySelector('.header-acoes');
+        const avatar = document.getElementById('avatarHeader');
         const logoutBtn = document.getElementById('logoutBtn');
         if (headerAcoes) {
             // Feeds com hamburger: sino fica no header, à esquerda do ☰
             headerAcoes.insertBefore(estrutura, headerAcoes.firstChild);
+        } else if (avatar) {
+            navLinks.insertBefore(estrutura, avatar);
         } else if (logoutBtn) {
             navLinks.insertBefore(estrutura, logoutBtn);
         } else {
             navLinks.appendChild(estrutura);
         }
+    }
+
+    async function iniciar() {
+        if (!window.auth || !window.auth.isLogado()) {
+            remover(); // tira o sino que veio do cache, se a sessão acabou
+            return;
+        }
+        if (!window.notificacoesService) return;
+        const usuario = window.auth.getUsuarioLogado();
+        if (!usuario) return;
+
+        inserirSino(); // não faz nada se o sino já foi criado a partir do cache
 
         await carregar(usuario.id);
 
@@ -226,25 +247,25 @@
     window.removerSinoNotificacoes = remover;
 
     document.addEventListener('DOMContentLoaded', function () {
+        // Instantâneo: desenha o sino já; o conteúdo carrega em seguida
+        if (lerUsuarioCache()) inserirSino();
+
         async function tentarIniciar() {
             const pronto =
                 typeof auth !== 'undefined' && window.notificacoesService && window.notificacoesService.inicializado;
 
             if (!pronto) {
-                setTimeout(tentarIniciar, 500);
+                setTimeout(tentarIniciar, 100);
                 return;
             }
 
-            // Espera a restauração da sessão terminar (igual o feed.js já faz) —
-            // sem isso, isLogado() responde "false" cedo demais mesmo com o
-            // usuário logado de verdade, e o sino nunca chega a ser criado.
             if (auth.initPromise) {
                 await auth.initPromise;
             }
 
             iniciar();
         }
-        setTimeout(tentarIniciar, 700);
+        tentarIniciar();
     });
 })();
 

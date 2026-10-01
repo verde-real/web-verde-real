@@ -30,11 +30,27 @@
         existente.innerHTML = conteudoBolinha(usuario);
     }
 
-    function iniciar() {
-        if (!window.auth || !window.auth.isLogado()) return;
-        const usuario = window.auth.getUsuarioLogado();
+    function lerUsuarioCache() {
+        try {
+            var bruto = localStorage.getItem('verdeRealUsuario') || sessionStorage.getItem('verdeRealUsuario');
+            var u = bruto ? JSON.parse(bruto) : null;
+            return u && typeof u.nome === 'string' && u.nome ? u : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function remover() {
+        var el = document.getElementById('avatarHeader');
+        if (el) el.remove();
+    }
+
+    function iniciar(usuario) {
         if (!usuario) return;
-        if (document.getElementById('avatarHeader')) return;
+        if (document.getElementById('avatarHeader')) {
+            atualizarBolinha(usuario);
+            return;
+        }
 
         const bolinha = criarBolinha(usuario);
 
@@ -50,12 +66,14 @@
             return;
         }
 
-        // Páginas públicas (sem hamburger): bolinha entra no menu,
-        // antes do botão "Sair" — mesmo padrão que o sino já usa
+        // Páginas públicas: bolinha entra no menu, depois do sino e antes do "Sair"
         const navLinks = document.querySelector('.nav-links');
         if (!navLinks) return;
+        const sino = document.getElementById('sinoNotificacoes');
         const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
+        if (sino) {
+            sino.insertAdjacentElement('afterend', bolinha);
+        } else if (logoutBtn) {
             navLinks.insertBefore(bolinha, logoutBtn);
         } else {
             navLinks.appendChild(bolinha);
@@ -66,18 +84,25 @@
     window.atualizarAvatarHeader = atualizarBolinha;
 
     document.addEventListener('DOMContentLoaded', function () {
-        async function tentarIniciar() {
-            const pronto = typeof auth !== 'undefined';
-            if (!pronto) {
-                setTimeout(tentarIniciar, 500);
+        // 1) Instantâneo: usa o usuário guardado no navegador
+        const cache = lerUsuarioCache();
+        if (cache) iniciar(cache);
+
+        // 2) Confirma com a sessão real (corrige foto/nome ou remove se deslogou)
+        let tentativas = 0;
+        async function confirmar() {
+            if (typeof auth === 'undefined') {
+                if (++tentativas < 100) setTimeout(confirmar, 100);
                 return;
             }
-            if (auth.initPromise) {
-                await auth.initPromise;
+            if (auth.initPromise) await auth.initPromise;
+            if (auth.isLogado() && auth.getUsuarioLogado()) {
+                iniciar(auth.getUsuarioLogado());
+            } else {
+                remover();
             }
-            iniciar();
         }
-        setTimeout(tentarIniciar, 700);
+        confirmar();
     });
 })();
 
