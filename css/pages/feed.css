@@ -22,7 +22,7 @@
     padding: 0 var(--pad-lateral);
     display: grid;
     grid-template-columns: 1fr 360px;
-    gap: 2.5rem;j
+    gap: 2.5rem;
 }
 
 .feed-central {
@@ -1260,13 +1260,15 @@
 .status-tag i {
     color: var(--verde-primario);
 }
+
 /* ============================================================
    14. HEADER COM MENU HAMBURGER + NAVEGAÇÃO FIXA (SOMENTE FEEDS)
    Escopo: body.pagina-feed  (perfil/notificações não são afetados)
    ============================================================ */
-body.pagina-feed .header-acoes .sino-btn {
-    padding: 10px;
-    font-size: 1.15rem;
+body.pagina-feed {
+    --vr-header-h: 72px;   /* altura fixa do header nos feeds */
+    --vr-nav-h: 84px;      /* altura da barra horizontal (mobile) */
+    --vr-offset-topo: calc(var(--vr-header-h) + var(--vr-nav-h) + 16px);
 }
 
 .avatar-header {
