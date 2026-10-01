@@ -983,6 +983,26 @@ footer::after {
     }
 }
 
+/* Bolinha de perfil dentro do .nav-links (páginas públicas):
+   impede que herde o estilo dos links do menu (sublinhado animado,
+   caixa alta, padding-bottom, troca de cor). Fica igual à do feed. */
+.nav-links a.avatar-header:not(.btn-login):not(.btn-acao),
+.nav-links a.avatar-header:not(.btn-login):not(.btn-acao):hover {
+    padding-bottom: 0;
+    font-weight: bold;
+    font-size: 1rem;
+    text-transform: none;
+    letter-spacing: normal;
+    color: var(--verde-secundario);
+    transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.nav-links a.avatar-header:not(.btn-login):not(.btn-acao)::after,
+.nav-links a.avatar-header:not(.btn-login):not(.btn-acao):hover::after {
+    content: none;
+    width: 0;
+}
+
 .sino-badge {
     position: absolute;
     top: 0;
