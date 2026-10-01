@@ -34,17 +34,31 @@
         if (!window.auth || !window.auth.isLogado()) return;
         const usuario = window.auth.getUsuarioLogado();
         if (!usuario) return;
+        if (document.getElementById('avatarHeader')) return;
 
-        const headerAcoes = document.querySelector('.header-acoes');
-        if (!headerAcoes || document.getElementById('avatarHeader')) return;
-
-        const toggle = document.getElementById('vrMenuToggle');
         const bolinha = criarBolinha(usuario);
 
-        if (toggle) {
-            headerAcoes.insertBefore(bolinha, toggle);
+        const headerAcoes = document.querySelector('.header-acoes');
+        if (headerAcoes) {
+            // Páginas com hamburger: bolinha fica no header, antes do ☰
+            const toggle = document.getElementById('vrMenuToggle');
+            if (toggle) {
+                headerAcoes.insertBefore(bolinha, toggle);
+            } else {
+                headerAcoes.appendChild(bolinha);
+            }
+            return;
+        }
+
+        // Páginas públicas (sem hamburger): bolinha entra no menu,
+        // antes do botão "Sair" — mesmo padrão que o sino já usa
+        const navLinks = document.querySelector('.nav-links');
+        if (!navLinks) return;
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            navLinks.insertBefore(bolinha, logoutBtn);
         } else {
-            headerAcoes.appendChild(bolinha);
+            navLinks.appendChild(bolinha);
         }
     }
 

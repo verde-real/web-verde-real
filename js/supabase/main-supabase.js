@@ -107,6 +107,29 @@ function toastInfo(message, duration) {
 }
 
 // ============================================================
+// 2.5. ALTURA REAL DO HEADER → --vr-header-h
+// Mede o header de verdade (ele é igual em toda página) e expõe
+// como variável CSS, pra barra/coluna de atalhos do feed sempre
+// encostar certinho embaixo dele, sem precisar "chutar" um valor.
+// ============================================================
+(function sincronizarAlturaHeader() {
+    const header = document.querySelector('header');
+    if (!header) return;
+
+    function atualizar() {
+        document.documentElement.style.setProperty('--vr-header-h', header.offsetHeight + 'px');
+    }
+
+    atualizar();
+
+    if (typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(atualizar).observe(header);
+    } else {
+        window.addEventListener('resize', atualizar);
+    }
+})();
+
+// ============================================================
 // 3. HEADER - AUTENTICAÇÃO
 // ============================================================
 
