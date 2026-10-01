@@ -1309,10 +1309,6 @@ body.pagina-feed header {
     align-items: center;
     text-align: left;
     gap: 1rem;
-    height: var(--vr-header-h);
-    min-height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
 }
 
 body.pagina-feed .logo-box h1 {
@@ -1415,7 +1411,7 @@ body.pagina-feed .stories-bar {
     --vr-c: 40px;          /* círculo dos atalhos comuns */
     --vr-c-main: 52px;     /* círculo do botão principal */
     position: fixed;
-    top: var(--vr-header-h);
+    top: var(--vr-header-h, 80px);
     left: 0;
     right: 0;
     width: auto;
@@ -1494,6 +1490,17 @@ body.pagina-feed .feed-wrapper {
     padding-top: var(--vr-nav-h);
 }
 
+/* Reserva o espaço da barra fixa para o feed não ficar escondido */
+body.pagina-feed .feed-wrapper {
+    padding-top: var(--vr-nav-h);
+}
+
+/* Páginas com o header novo mas SEM a coluna/barra de atalhos
+(notificações, perfil de terceiros, meu perfil) */
+body.pagina-feed .feed-wrapper.feed-wrapper--sem-rail {
+    padding-top: 0;
+}
+
 /* Alvos de scroll não ficam sob header + barra */
 body.pagina-feed #form-selo,
 body.pagina-feed #ranking-container,
@@ -1527,7 +1534,7 @@ body.pagina-feed #perfilCard {
 @media (min-width: 1025px) {
     body.pagina-feed {
         --vr-rail-w: 84px;
-        --vr-offset-topo: calc(var(--vr-header-h) + 16px);
+        --vr-offset-topo: calc(var(--vr-header-h, 80px) + 16px);
     }
 
     /* Recuo à esquerda só onde a coluna encostaria no conteúdo */
@@ -1539,12 +1546,24 @@ body.pagina-feed #perfilCard {
         );
     }
 
+    body.pagina-feed .feed-wrapper {
+        padding-top: 0;
+        padding-left: max(
+            var(--pad-lateral),
+            calc(var(--vr-rail-w) + 16px - max(0px, calc((100vw - 1280px) / 2)))
+        );
+    }
+
+    body.pagina-feed .feed-wrapper.feed-wrapper--sem-rail {
+        padding-left: var(--pad-lateral);
+    }
+
     body.pagina-feed .stories-bar {
         --vr-c: 54px;
         --vr-c-main: 72px;
         left: 0;
         right: auto;
-        top: var(--vr-header-h);
+        top: var(--vr-header-h, 80px);
         bottom: 0;
         width: var(--vr-rail-w);
         height: auto;
