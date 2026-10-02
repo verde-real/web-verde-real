@@ -1266,9 +1266,8 @@
    Escopo: body.pagina-feed  (perfil/notificações não são afetados)
    ============================================================ */
 body.pagina-feed {
-    --vr-header-h: 72px;   /* altura fixa do header nos feeds */
     --vr-nav-h: 84px;      /* altura da barra horizontal (mobile) */
-    --vr-offset-topo: calc(var(--vr-header-h) + var(--vr-nav-h) + 16px);
+    --vr-offset-topo: calc(var(--vr-header-h, 80px) + var(--vr-nav-h) + 16px);
 }
 
 .avatar-header {
