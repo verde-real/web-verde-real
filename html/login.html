@@ -109,7 +109,8 @@
                         <label>Senha</label>
                         <div class="input__icone">
                             <i class="fas fa-lock"></i>
-                            <input type="password" id="loginSenha" placeholder="••••••••">
+                            <input type="password" id="loginSenha" class="com-ver-senha" placeholder="••••••••" autocomplete="current-password">
+                            <button type="button" class="btn-ver-senha" data-alvo="loginSenha" aria-label="Mostrar senha" aria-pressed="false"><i class="far fa-eye"></i></button>
                         </div>
                     </div>
                     
@@ -173,29 +174,33 @@
                     </div>
                     
                     <div class="form__grupo-input">
-                        <label>Senha</label>
+                        <label for="criarSenha">Senha</label>
                         <div class="input__icone">
                             <i class="fas fa-lock"></i>
-                            <input type="password" id="criarSenha" placeholder="mínimo 6 caracteres">
+                            <input type="password" id="criarSenha" class="com-ver-senha" placeholder="mínimo 8 caracteres" autocomplete="new-password" aria-describedby="senhaRequisitos">
+                            <button type="button" class="btn-ver-senha" data-alvo="criarSenha" aria-label="Mostrar senha" aria-pressed="false"><i class="far fa-eye"></i></button>
                         </div>
                         <div class="tamanho-senha">
                             <div class="barra-senha"></div>
                             <div class="barra-senha"></div>
                             <div class="barra-senha"></div>
                         </div>
+                        <span class="senha-rotulo" aria-live="polite"></span>
+                        <ul class="senha-requisitos" id="senhaRequisitos"></ul>
                     </div>
-                    
                     <div class="form__grupo-input">
-                        <label>Confirmar senha</label>
+                        <label for="confirmarSenha">Confirmar senha</label>
                         <div class="input__icone">
                             <i class="fas fa-lock"></i>
-                            <input type="password" id="confirmarSenha" placeholder="********">
+                            <input type="password" id="confirmarSenha" class="com-ver-senha" placeholder="********" autocomplete="new-password">
+                            <button type="button" class="btn-ver-senha" data-alvo="confirmarSenha" aria-label="Mostrar senha" aria-pressed="false"><i class="far fa-eye"></i></button>
                         </div>
+                        <small class="senha-confirmacao" id="senhaConfirmacao" aria-live="polite"></small>
                     </div>
                     
                     <div class="checkbox">
                         <input type="checkbox" id="termos">
-                        <label for="termos">Aceito os termos de uso e política de privacidade</label>
+                        <label for="termos">Li e aceito os <a href="termos.html#termos" target="_blank" rel="noopener">termos de uso</a> e a <a href="termos.html#privacidade" target="_blank" rel="noopener">política de privacidade</a></label>
                     </div>
                     
                     <button type="submit" class="btn-acao btn--escuro" id="btnCriarConta">
@@ -208,7 +213,7 @@
             <!-- ============================================================
                  FORMULÁRIO DE RECUPERAR SENHA
                  ============================================================ -->
-            <div id="recuperarContaForm" class="form">
+            <form class="form__conteudo" id="formRecuperarSenha">
                 <div class="form__conteudo">
                     
                     <p style="color: var(--verde-detalhe2); font-size: 0.95rem; margin-bottom: 0.5rem;">
@@ -232,7 +237,7 @@
                     </button>
                     
                 </div>
-            </div>
+            </form>
 
         </div>
     </div>
@@ -284,6 +289,8 @@
         //  em login.js — não duplicar o listener aqui)
         // ============================================================
         document.addEventListener('DOMContentLoaded', async function() {
+            // Chegou pelo link do e-mail de recuperação: não redirecionar, o modal de redefinição cuida
+            if (window.location.hash.includes('type=recovery')) return;
             if (typeof auth !== 'undefined' && auth && auth.initPromise) {
                 await auth.initPromise;
             }

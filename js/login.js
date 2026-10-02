@@ -10,6 +10,45 @@
 // - Mensagens de feedback
 // ============================================================
 
+// Pinta barras, rótulo e checklist de requisitos (usa a regra única do core)
+function pintarAvaliacaoSenha(raiz, av) {
+    if (!raiz) return;
+    const classes = ['fraca', 'media', 'forte'];
+    raiz.querySelectorAll('.barra-senha').forEach((barra, i) => {
+        barra.className = 'barra-senha';
+        if (av.nivel > 0 && i < av.nivel) barra.classList.add(classes[av.nivel - 1]);
+    });
+    const rotulo = raiz.querySelector('.senha-rotulo');
+    if (rotulo) rotulo.textContent = av.nivel ? 'Senha ' + av.rotulo.toLowerCase() : '';
+    const lista = raiz.querySelector('.senha-requisitos');
+    if (!lista) return;
+    lista.innerHTML = '';
+    av.requisitos.forEach((r) => {
+        const li = document.createElement('li');
+        if (r.atendido) li.className = 'ok';
+        const icone = document.createElement('i');
+        icone.className = r.atendido ? 'fas fa-check-circle' : 'far fa-circle';
+        icone.setAttribute('aria-hidden', 'true');
+        li.appendChild(icone);
+        li.appendChild(document.createTextNode(' ' + r.texto + (r.atendido ? ' (ok)' : '')));
+        lista.appendChild(li);
+    });
+}
+
+// Mostrar/ocultar senha (um único listener para todos os botões)
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.btn-ver-senha');
+    if (!btn) return;
+    const input = document.getElementById(btn.dataset.alvo);
+    if (!input) return;
+    const mostrar = input.type === 'password';
+    input.type = mostrar ? 'text' : 'password';
+    btn.setAttribute('aria-label', mostrar ? 'Ocultar senha' : 'Mostrar senha');
+    btn.setAttribute('aria-pressed', String(mostrar));
+    const ic = btn.querySelector('i');
+    if (ic) ic.className = mostrar ? 'far fa-eye-slash' : 'far fa-eye';
+});
+
 class LoginManager {
     constructor() {
         console.log('🔐 Inicializando LoginManager...');
@@ -161,11 +200,16 @@ class LoginManager {
             });
         }
 
-        // Validação de senha em tempo real
+        // Validação de senha em tempo real (checklist + barras + confirmação)
         if (this.criarSenha) {
-            this.criarSenha.addEventListener('input', () => {
-                this.validarSenha(this.criarSenha.value);
-            });
+            const atualizar = () => this.validarSenha(this.criarSenha.value);
+            this.criarSenha.addEventListener('input', atualizar);
+            this.criarSenha.addEventListener('focus', atualizar);
+            if (this.registrarNome) this.registrarNome.addEventListener('input', atualizar);
+            if (this.registrarEmail) this.registrarEmail.addEventListener('input', atualizar);
+        }
+        if (this.confirmarSenha) {
+            this.confirmarSenha.addEventListener('input', () => this.validarConfirmacao());
         }
 
         // Enter para enviar (campos de login)
@@ -403,24 +447,24 @@ class LoginManager {
     // VALIDAÇÃO DE SENHA (força)
     // ============================================================
     validarSenha(senha) {
-        const barras = document.querySelectorAll('.barra-senha');
-
-        let forca = 0;
-        if (senha.length >= 6) forca++;
-        if (senha.length >= 10) forca++;
-        if (/[A-Z]/.test(senha)) forca++;
-        if (/[0-9]/.test(senha)) forca++;
-        if (/[^A-Za-z0-9]/.test(senha)) forca++;
-
-        const nivel = Math.min(Math.floor(forca / 2) + 1, 3);
-        const classes = ['fraca', 'media', 'forte'];
-
-        barras.forEach((barra, index) => {
-            barra.className = 'barra-senha';
-            if (index < nivel) {
-                barra.classList.add(classes[nivel - 1]);
-            }
+        const av = VerdeRealCore.avaliarSenha(senha, {
+            nome: this.registrarNome ? this.registrarNome.value : '',
+            email: this.registrarEmail ? this.registrarEmail.value : ''
         });
+        const grupo = this.criarSenha ? this.criarSenha.closest('.form__grupo-input') : null;
+        pintarAvaliacaoSenha(grupo, av);
+        this.validarConfirmacao();
+        return av;
+    }
+
+    validarConfirmacao() {
+        const el = document.getElementById('senhaConfirmacao');
+        if (!el || !this.confirmarSenha || !this.criarSenha) return;
+        const c = this.confirmarSenha.value;
+        if (!c) { el.textContent = ''; el.className = 'senha-confirmacao'; return; }
+        const ok = c === this.criarSenha.value;
+        el.className = 'senha-confirmacao ' + (ok ? 'ok' : 'erro');
+        el.textContent = ok ? '✔ As senhas coincidem' : '✖ As senhas ainda não coincidem';
     }
 
     // ============================================================
@@ -528,7 +572,14 @@ class LoginManager {
                 <form id="formRedefinicao">
                     <div class="form-grupo">
                         <label>Nova Senha</label>
-                        <input type="password" id="novaSenha" placeholder="Mínimo 6 caracteres" required minlength="6">
+                        <input type="password" id="novaSenha" placeholder="Mínimo 8 caracteres" required minlength="8" autocomplete="new-password">
+                        <div class="tamanho-senha">
+                            <div class="barra-senha"></div>
+                            <div class="barra-senha"></div>
+                            <div class="barra-senha"></div>
+                        </div>
+                        <span class="senha-rotulo" aria-live="polite"></span>
+                        <ul class="senha-requisitos"></ul>
                     </div>
                     <div class="form-grupo">
                         <label>Confirmar Nova Senha</label>
@@ -543,6 +594,15 @@ class LoginManager {
         `;
 
         document.body.appendChild(modal);
+
+        const emailCtx = email && email.includes('@') ? email : '';
+        const grupoNova = modal.querySelector('#novaSenha').closest('.form-grupo');
+        const atualizarNova = () => pintarAvaliacaoSenha(
+            grupoNova,
+            VerdeRealCore.avaliarSenha(modal.querySelector('#novaSenha').value, { email: emailCtx })
+        );
+        modal.querySelector('#novaSenha').addEventListener('input', atualizarNova);
+        atualizarNova();
 
         // Fechar modal
         modal.querySelector('.btn-cancelar').addEventListener('click', () => modal.remove());
@@ -562,8 +622,9 @@ class LoginManager {
                 return;
             }
 
-            if (novaSenha.length < 6) {
-                this.mostrarMensagem('⚠️ A senha deve ter pelo menos 6 caracteres.', 'error');
+            const av = VerdeRealCore.avaliarSenha(novaSenha, { email: emailCtx });
+            if (!av.valida) {
+                this.mostrarMensagem('⚠️ ' + VerdeRealCore.mensagemSenhaInsegura(av), 'error');
                 return;
             }
 
