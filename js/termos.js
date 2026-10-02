@@ -27,7 +27,7 @@
             || !Array.isArray(VerdeRealCore.TERMOS_DE_USO)
             || !Array.isArray(VerdeRealCore.POLITICA_PRIVACIDADE);
         if (incompleto) {
-            document.getElementById('termos').textContent = 'Não foi possível carregar o conteúdo agora. Recarregue a página.';
+            document.getElementById('termos').textContent = 'Não foi possível carregar o conteúdo. O arquivo js/vendor/verde-real-core.global.js está ausente ou desatualizado (precisa conter TERMOS_DE_USO).';
             document.getElementById('termos').classList.add('ativa');
             document.getElementById('abaTermos').classList.add('ativa');
             return;

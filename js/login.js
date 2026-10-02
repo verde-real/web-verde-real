@@ -449,6 +449,8 @@ class LoginManager {
     validarSenha(senha) {
         if (typeof VerdeRealCore === 'undefined' || typeof VerdeRealCore.avaliarSenha !== 'function') {
             console.error('[login] VerdeRealCore.avaliarSenha indisponível');
+            const rot = document.querySelector('#criarContaForm .senha-rotulo');
+            if (rot) rot.textContent = 'Erro: js/vendor/verde-real-core.global.js ausente ou desatualizado.';
             return { valida: false, faltando: [], requisitos: [], nivel: 0, rotulo: '' };
         }
         const av = VerdeRealCore.avaliarSenha(senha, {
@@ -460,7 +462,7 @@ class LoginManager {
         this.validarConfirmacao();
         return av;
     }
-    
+
     validarConfirmacao() {
         const el = document.getElementById('senhaConfirmacao');
         if (!el || !this.confirmarSenha || !this.criarSenha) return;
