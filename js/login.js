@@ -447,6 +447,10 @@ class LoginManager {
     // VALIDAÇÃO DE SENHA (força)
     // ============================================================
     validarSenha(senha) {
+        if (typeof VerdeRealCore === 'undefined' || typeof VerdeRealCore.avaliarSenha !== 'function') {
+            console.error('[login] VerdeRealCore.avaliarSenha indisponível');
+            return { valida: false, faltando: [], requisitos: [], nivel: 0, rotulo: '' };
+        }
         const av = VerdeRealCore.avaliarSenha(senha, {
             nome: this.registrarNome ? this.registrarNome.value : '',
             email: this.registrarEmail ? this.registrarEmail.value : ''
@@ -456,7 +460,7 @@ class LoginManager {
         this.validarConfirmacao();
         return av;
     }
-
+    
     validarConfirmacao() {
         const el = document.getElementById('senhaConfirmacao');
         if (!el || !this.confirmarSenha || !this.criarSenha) return;

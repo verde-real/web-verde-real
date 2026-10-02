@@ -23,9 +23,13 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        if (typeof VerdeRealCore === 'undefined') {
+        const incompleto = typeof VerdeRealCore === 'undefined'
+            || !Array.isArray(VerdeRealCore.TERMOS_DE_USO)
+            || !Array.isArray(VerdeRealCore.POLITICA_PRIVACIDADE);
+        if (incompleto) {
             document.getElementById('termos').textContent = 'Não foi possível carregar o conteúdo agora. Recarregue a página.';
             document.getElementById('termos').classList.add('ativa');
+            document.getElementById('abaTermos').classList.add('ativa');
             return;
         }
         desenhar(document.getElementById('termos'), VerdeRealCore.TERMOS_DE_USO);
