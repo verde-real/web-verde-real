@@ -1228,4 +1228,67 @@ footer::after {
     color: #c62828;
 }
 
+/* ============================================================
+   BOTÃO VOLTAR AO TOPO (discreto)
+   ============================================================ */
+.vr-voltar-topo {
+    position: fixed;
+    right: max(16px, env(safe-area-inset-right, 0px));
+    bottom: calc(var(--vr-topo-bottom, 20px) + env(safe-area-inset-bottom, 0px));
+    z-index: 900; /* abaixo do header (1000), dos modais e do toast (10000) */
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: var(--verde-secundario);
+    color: var(--branco);
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    opacity: 0;
+    visibility: hidden; /* escondido não recebe clique nem foco */
+    transform: translateY(8px);
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s, background 0.2s ease;
+}
 
+.vr-voltar-topo--visivel {
+    opacity: 0.8;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.vr-voltar-topo:hover,
+.vr-voltar-topo:focus-visible {
+    opacity: 1;
+    background: var(--verde-primario);
+}
+
+.vr-voltar-topo:focus-visible {
+    outline: 2px solid var(--verde-secundario);
+    outline-offset: 3px;
+}
+
+/* Celular / toque: alvo de 44px */
+@media (pointer: coarse) {
+    .vr-voltar-topo {
+        width: 44px;
+        height: 44px;
+    }
+}
+
+/* Computador: um pouco mais afastado da borda */
+@media (min-width: 1024px) {
+    .vr-voltar-topo {
+        right: max(28px, env(safe-area-inset-right, 0px));
+        --vr-topo-bottom: 28px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vr-voltar-topo {
+        transition: none;
+    }
+}

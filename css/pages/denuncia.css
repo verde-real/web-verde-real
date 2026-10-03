@@ -190,3 +190,12 @@
         padding: 0.65rem 1rem;
     }
 }
+
+.vr-voltar-topo {
+    --vr-topo-bottom: 88px;
+}
+@media (min-width: 1024px) {
+    .vr-voltar-topo {
+        --vr-topo-bottom: 88px;
+    }
+}
