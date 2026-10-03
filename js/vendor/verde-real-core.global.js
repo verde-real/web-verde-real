@@ -40,7 +40,6 @@ var VerdeRealCore = (() => {
     ROTULO_STATUS_SOLICITACAO: () => ROTULO_STATUS_SOLICITACAO,
     ROTULO_TIPO_DOCUMENTO: () => ROTULO_TIPO_DOCUMENTO,
     SENHA_MIN_CARACTERES: () => SENHA_MIN_CARACTERES,
-    SENHA_RECOMENDADA_CARACTERES: () => SENHA_RECOMENDADA_CARACTERES,
     STATUS_LABEL: () => STATUS_LABEL,
     STATUS_SOLICITACAO_ABERTOS: () => STATUS_SOLICITACAO_ABERTOS,
     TABELA_DOCUMENTOS_SOLICITACAO: () => TABELA_DOCUMENTOS_SOLICITACAO,
@@ -86,52 +85,8 @@ var VerdeRealCore = (() => {
 
   // src/regras/senha.ts
   var SENHA_MIN_CARACTERES = 8;
-  var SENHA_RECOMENDADA_CARACTERES = 12;
-  var SENHAS_COMUNS = [
-    "12345678",
-    "123456789",
-    "1234567890",
-    "87654321",
-    "11111111",
-    "00000000",
-    "password",
-    "password1",
-    "qwerty123",
-    "qwertyui",
-    "abc12345",
-    "abcd1234",
-    "senha123",
-    "senha1234",
-    "senha@123",
-    "mudar123",
-    "admin123",
-    "brasil123",
-    "iloveyou",
-    "letmein1"
-  ];
-  function normalizar(texto) {
-    return texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  }
-  function trechosPessoais(contexto) {
-    const trechos = [];
-    const adicionar = (t) => {
-      if (t.length >= 3) trechos.push(t);
-    };
-    if (contexto.nome) {
-      normalizar(contexto.nome).split(/[^a-z0-9]+/).forEach(adicionar);
-    }
-    if (contexto.email) {
-      const local = normalizar(contexto.email.split("@")[0]);
-      local.split(/[^a-z0-9]+/).forEach(adicionar);
-      adicionar(local.replace(/[^a-z0-9]/g, ""));
-    }
-    return trechos;
-  }
-  function avaliarSenha(senha, contexto = {}) {
+  function avaliarSenha(senha, _contexto = {}) {
     const vazia = senha.length === 0;
-    const normalizada = normalizar(senha);
-    const temDadosPessoais = trechosPessoais(contexto).some((t) => normalizada.includes(t));
-    const ehComum = SENHAS_COMUNS.includes(normalizada) || normalizada.includes("verdereal") || /^(.)\1+$/.test(normalizada);
     const requisitos = [
       {
         id: "tamanho",
@@ -147,27 +102,16 @@ var VerdeRealCore = (() => {
         texto: "Um s\xEDmbolo (ex.: ! @ # $ %)",
         atendido: /[^A-Za-z0-9À-ÿ\s]/.test(senha),
         obrigatorio: true
-      },
-      {
-        id: "dados-pessoais",
-        texto: "N\xE3o conter seu nome ou e-mail",
-        atendido: !vazia && !temDadosPessoais,
-        obrigatorio: true
-      },
-      { id: "comum", texto: "N\xE3o ser uma senha muito comum", atendido: !vazia && !ehComum, obrigatorio: true },
-      {
-        id: "recomendado",
-        texto: `Recomendado: ${SENHA_RECOMENDADA_CARACTERES} ou mais caracteres`,
-        atendido: senha.length >= SENHA_RECOMENDADA_CARACTERES,
-        obrigatorio: false
       }
     ];
-    const faltando = requisitos.filter((r) => r.obrigatorio && !r.atendido);
+    const faltando = requisitos.filter((r) => !r.atendido);
     const valida = !vazia && faltando.length === 0;
+    const atendidos = requisitos.length - faltando.length;
     let nivel = 0;
     if (!vazia) {
-      if (!valida) nivel = 1;
-      else nivel = senha.length >= SENHA_RECOMENDADA_CARACTERES ? 3 : 2;
+      if (valida) nivel = 3;
+      else if (atendidos >= 3) nivel = 2;
+      else nivel = 1;
     }
     const rotulos = ["", "Fraca", "M\xE9dia", "Forte"];
     return { requisitos, nivel, rotulo: rotulos[nivel], valida, faltando };
