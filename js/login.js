@@ -254,9 +254,6 @@ class LoginManager {
         if (target) {
             target.classList.add('active');
         }
-
-        // Limpar mensagens
-        this.removerMensagem();
     }
 
     getFormId(aba) {
@@ -495,28 +492,59 @@ class LoginManager {
     mostrarMensagem(texto, tipo = 'info') {
         this.removerMensagem();
 
+        // Tira emoji do início (ex.: "⚠️ ", "✅ "): o ícone vem do Font Awesome
+        const limpo = String(texto)
+            .replace(/^[\p{Extended_Pictographic}\uFE0F\u200D\s]+/u, '')
+            .trim();
+
+        const icones = {
+            success: 'fa-check-circle',
+            error: 'fa-exclamation-circle',
+            warning: 'fa-exclamation-triangle',
+            info: 'fa-info-circle'
+        };
+
         const div = document.createElement('div');
         div.className = `login-mensagem ${tipo}`;
-        div.textContent = texto;
+        div.setAttribute('role', tipo === 'error' ? 'alert' : 'status');
 
-        const container = document.querySelector('.login-forms') || document.querySelector('.forms');
-        if (container) {
-            container.prepend(div);
-        }
+        const icone = document.createElement('i');
+        icone.className = `fas ${icones[tipo] || icones.info} login-mensagem__icone`;
+        icone.setAttribute('aria-hidden', 'true');
 
-        // Auto-remover após 5 segundos (exceto loading)
+        const span = document.createElement('span');
+        span.className = 'login-mensagem__texto';
+        span.textContent = limpo;
+
+        const fechar = document.createElement('button');
+        fechar.type = 'button';
+        fechar.className = 'login-mensagem__fechar';
+        fechar.setAttribute('aria-label', 'Fechar mensagem');
+        fechar.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i>';
+        fechar.addEventListener('click', () => this.esconderMensagem(div));
+
+        div.append(icone, span, fechar);
+        document.body.appendChild(div); // flutua em relação à tela, não ao formulário
+
+        // Auto-remover (erro fica um pouco mais, pra dar tempo de ler)
         if (tipo !== 'loading') {
-            setTimeout(() => {
-                div.style.opacity = '0';
-                div.style.transition = 'opacity 0.3s';
-                setTimeout(() => div.remove(), 300);
-            }, 5000);
+            this._timerMensagem = setTimeout(
+                () => this.esconderMensagem(div),
+                tipo === 'error' ? 7000 : 5000
+            );
         }
     }
 
+    esconderMensagem(div) {
+        if (!div || !div.isConnected) return;
+        clearTimeout(this._timerMensagem);
+        div.classList.add('saindo');
+        setTimeout(() => div.remove(), 250);
+    }
+
     removerMensagem() {
-        const old = document.querySelector('.login-mensagem');
-        if (old) old.remove();
+        clearTimeout(this._timerMensagem);
+        document.querySelectorAll('.login-mensagem').forEach((el) => el.remove());
     }
 
     // ============================================================
